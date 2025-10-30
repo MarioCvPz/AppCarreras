@@ -5,42 +5,59 @@ import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.appcarreras.data.database.DatabaseProvider
+import com.example.appcarreras.data.entity.TorneoEntity
 import com.example.appcarreras.databinding.ActivityMainBinding
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: CampeonatoAdapter
-    private val listaCampeonatos = mutableListOf<Campeonato>()
+
+    // Base de datos
+    private val db by lazy { DatabaseProvider.getDatabase(this) }
+    private val torneoDao by lazy { db.torneoDao() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
+
 
         // Inicializar RecyclerView
-        adapter = CampeonatoAdapter(this, listaCampeonatos)
+        adapter = CampeonatoAdapter(this, mutableListOf())
         binding.recyclerCampeonatos.layoutManager = LinearLayoutManager(this)
         binding.recyclerCampeonatos.adapter = adapter
 
+        // Cargar torneos desde la base de datos
+        cargarTorneosDesdeBD()
+
         // FAB para añadir campeonato
         binding.fabAdd.setOnClickListener { mostrarDialogoNuevoCampeonato() }
-
-        // Cargar algunos ejemplos
-        cargarEjemploInicial()
     }
 
-    private fun cargarEjemploInicial() {
-        listaCampeonatos.addAll(
-            listOf(
-            )
-        )
-        adapter.notifyDataSetChanged()
+    /** Carga todos los torneos guardados en la base de datos y los muestra en el RecyclerView */
+    private fun cargarTorneosDesdeBD() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val torneos = torneoDao.obtenerTorneos()
+
+            // Convertimos TorneoEntity -> Campeonato (para el adaptador actual)
+            val listaCampeonatos = torneos.map { Campeonato(it.nombre, 0) }
+
+            withContext(Dispatchers.Main) {
+                adapter.actualizarLista(listaCampeonatos)
+            }
+        }
     }
 
+    /** Muestra el diálogo para crear un nuevo torneo y guardarlo en la BD */
     private fun mostrarDialogoNuevoCampeonato() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_nuevo_campeonato, null)
         val etNombre = dialogView.findViewById<EditText>(R.id.etNombreCampeonato)
@@ -57,8 +74,19 @@ class MainActivity : AppCompatActivity() {
             botonPositivo.setOnClickListener {
                 val nombre = etNombre.text.toString().trim()
                 if (nombre.isNotEmpty()) {
-                    val nuevo = Campeonato(nombre, 0)
-                    adapter.agregarCampeonato(nuevo)
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        // 1️⃣ Guardamos en la base de datos
+                        torneoDao.insertarTorneo(TorneoEntity(nombre = nombre))
+
+                        // 2️⃣ Volvemos a cargar la lista actualizada
+                        val torneos = torneoDao.obtenerTorneos()
+                        val listaCampeonatos = torneos.map { Campeonato(it.nombre, 0) }
+
+                        withContext(Dispatchers.Main) {
+                            adapter.actualizarLista(listaCampeonatos)
+                        }
+                    }
+
                     dialog.dismiss()
                 } else {
                     etNombre.error = "El nombre no puede estar vacío"
@@ -76,21 +104,40 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.menu_campeonatos, menu)
 
         val searchItem = menu?.findItem(R.id.action_search)
-        val searchView = searchItem?.actionView as? SearchView
+        val searchView = searchItem?.actionView as? androidx.appcompat.widget.SearchView
 
         searchView?.queryHint = "Buscar torneo..."
-        searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+        searchView?.setOnQueryTextListener(object :
+            androidx.appcompat.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                adapter.filter(query.orEmpty())
+                filtrarTorneos(query.orEmpty())
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                adapter.filter(newText.orEmpty())
+                filtrarTorneos(newText.orEmpty())
                 return true
             }
         })
 
         return true
     }
+
+    private fun filtrarTorneos(nombre: String) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val torneosFiltrados = if (nombre.isEmpty()) {
+                torneoDao.obtenerTorneos()
+            } else {
+                torneoDao.buscarTorneosPorNombre(nombre)
+            }
+
+            val listaCampeonatos = torneosFiltrados.map { Campeonato(it.nombre, 0) }
+
+            withContext(Dispatchers.Main) {
+                adapter.actualizarLista(listaCampeonatos)
+            }
+        }
+    }
+
 }

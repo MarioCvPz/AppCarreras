@@ -10,11 +10,10 @@ import androidx.recyclerview.widget.RecyclerView
 
 class CampeonatoAdapter(
     private val context: Context,
-    private var listaCampeonatos: MutableList<Campeonato>
+    private val listaCampeonatos: MutableList<Campeonato>
 ) : RecyclerView.Adapter<CampeonatoAdapter.CampeonatoViewHolder>() {
 
     private var listaFiltrada = listaCampeonatos.toMutableList()
-
     inner class CampeonatoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val nombreTextView: TextView = itemView.findViewById(R.id.tvNombreCampeonato)
         val detallesTextView: TextView = itemView.findViewById(R.id.tvDetallesCampeonato)
@@ -40,20 +39,11 @@ class CampeonatoAdapter(
 
     override fun getItemCount(): Int = listaFiltrada.size
 
-    fun agregarCampeonato(campeonato: Campeonato) {
-        listaCampeonatos.add(campeonato)
+    fun actualizarLista(nuevaLista: List<Campeonato>) {
+        listaCampeonatos.clear()
+        listaCampeonatos.addAll(nuevaLista)
         listaFiltrada = listaCampeonatos.toMutableList()
-        notifyItemInserted(listaFiltrada.size - 1)
-    }
-
-    fun filter(query: String) {
-        listaFiltrada = if (query.isEmpty()) {
-            listaCampeonatos.toMutableList()
-        } else {
-            listaCampeonatos.filter {
-                it.nombre.contains(query, ignoreCase = true)
-            }.toMutableList()
-        }
         notifyDataSetChanged()
     }
+
 }

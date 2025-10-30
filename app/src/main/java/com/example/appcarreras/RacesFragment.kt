@@ -1,6 +1,7 @@
 package com.example.appcarreras
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +26,12 @@ class RacesFragment : Fragment() {
             listOf(
             )
         )
+
+        binding.fabCreateRace.setOnClickListener {
+            // Aquí abriremos un diálogo para crear carrera
+            Log.d("RacesFragment", "FAB Create Race presionado")
+        }
+
 
         adapter = RaceAdapter(racesList)
         binding.recyclerRaces.layoutManager = LinearLayoutManager(requireContext())

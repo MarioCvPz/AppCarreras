@@ -3,6 +3,7 @@ package com.example.appcarreras
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,6 +33,13 @@ class CarsFragment : Fragment() {
         adapter = CarAdapter(carsList)
         binding.recyclerCars.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerCars.adapter = adapter
+
+        binding.fabAddCar.setOnClickListener {
+            // Aquí abriremos un diálogo para agregar coche
+            // (por ahora solo un log)
+            Log.d("CarsFragment", "FAB Add Car presionado")
+        }
+
 
         // Filtro de búsqueda
         binding.etBuscarCar.addTextChangedListener(object : TextWatcher {

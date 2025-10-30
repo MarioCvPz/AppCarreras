@@ -36,8 +36,5 @@ class TorneoDetailActivity : AppCompatActivity() {
             tab.text = tabTitles[position]
         }.attach()
 
-        // Botones flotantes (a implementar luego)
-        binding.btnAddCar.setOnClickListener { }
-        binding.btnCreateRace.setOnClickListener { }
     }
 }
