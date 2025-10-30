@@ -1,6 +1,7 @@
 package com.example.appcarreras.ui.races
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,6 +16,7 @@ import com.example.appcarreras.R
 import com.example.appcarreras.data.database.DatabaseProvider
 import com.example.appcarreras.data.entity.CarreraEntity
 import com.example.appcarreras.databinding.FragmentRacesBinding
+import com.example.appcarreras.ui.racedetail.RaceDetailActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -42,7 +44,7 @@ class RacesFragment : Fragment() {
     ): View {
         _binding = FragmentRacesBinding.inflate(inflater, container, false)
 
-        adapter = RaceAdapter(racesList)
+        adapter = RaceAdapter(racesList, ::abrirDetalleCarrera)
         binding.recyclerRaces.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerRaces.adapter = adapter
 
@@ -145,6 +147,17 @@ class RacesFragment : Fragment() {
         }
 
         dialog.show()
+    }
+
+    private fun abrirDetalleCarrera(race: Race) {
+        if (torneoId == -1L) return
+        val intent = Intent(requireContext(), RaceDetailActivity::class.java).apply {
+            putExtra(RaceDetailActivity.EXTRA_TORNEO_ID, torneoId)
+            putExtra(RaceDetailActivity.EXTRA_RACE_ID, race.id)
+            putExtra(RaceDetailActivity.EXTRA_RACE_NAME, race.name)
+            putExtra(RaceDetailActivity.EXTRA_RACE_DATE, race.date)
+        }
+        startActivity(intent)
     }
 
     override fun onDestroyView() {

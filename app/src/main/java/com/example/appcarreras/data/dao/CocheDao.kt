@@ -21,6 +21,8 @@ interface CocheDao {
     @Query("SELECT COUNT(*) FROM coches WHERE torneoId = :torneoId")
     suspend fun contarCochesPorTorneo(torneoId: Long): Int
 
+    @Query("SELECT * FROM coches WHERE torneoId = :torneoId AND dorsal = :dorsal LIMIT 1")
+    suspend fun obtenerCochePorDorsal(torneoId: Long, dorsal: Int): CocheEntity?
     @Delete
     suspend fun eliminarCoche(coche: CocheEntity)
 }

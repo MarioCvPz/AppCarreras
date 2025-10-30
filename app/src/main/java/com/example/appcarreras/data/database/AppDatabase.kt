@@ -12,7 +12,7 @@ import com.example.appcarreras.data.entity.*
         CarreraEntity::class,
         IncidenciaEntity::class
     ],
-    version = 4
+    version = 5
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun torneoDao(): TorneoDao

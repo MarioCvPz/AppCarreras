@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCarreras">
         <activity
+            android:name=".ui.racedetail.RaceDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.incidents.AddIncidentActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.cars.AddCarActivity"
             android:exported="false" />
         <activity

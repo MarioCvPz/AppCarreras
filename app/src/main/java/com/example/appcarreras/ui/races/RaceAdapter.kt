@@ -7,7 +7,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.appcarreras.R
 
-class RaceAdapter(private val races: List<Race>) :
+class RaceAdapter(
+    private val races: List<Race>,
+    private val onRaceClick: (Race) -> Unit,
+) :
     RecyclerView.Adapter<RaceAdapter.RaceViewHolder>() {
 
     inner class RaceViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -25,6 +28,7 @@ class RaceAdapter(private val races: List<Race>) :
         val race = races[position]
         holder.raceName.text = race.name
         holder.raceDate.text = race.date
+        holder.itemView.setOnClickListener { onRaceClick(race) }
     }
 
     override fun getItemCount(): Int = races.size
