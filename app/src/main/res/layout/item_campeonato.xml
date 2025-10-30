@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="#2B1A11"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp"
+    app:strokeWidth="0dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Ícono de trofeo -->
+        <ImageView
+            android:id="@+id/iconTrophy"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:backgroundTint="#FF7A1A"
+            app:srcCompat="@drawable/ic_trophy"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <!-- Nombre del campeonato -->
+        <TextView
+            android:id="@+id/tvNombreCampeonato"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            app:layout_constraintStart_toEndOf="@id/iconTrophy"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/arrowRight"
+            app:layout_constraintHorizontal_bias="0"
+            android:layout_marginStart="12dp"
+            tools:text="GT World Challenge 2024" />
+
+        <!-- Temporada y coches -->
+        <TextView
+            android:id="@+id/tvDetallesCampeonato"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="#BDBDBD"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp"
+            app:layout_constraintStart_toStartOf="@id/tvNombreCampeonato"
+            app:layout_constraintTop_toBottomOf="@id/tvNombreCampeonato"
+            app:layout_constraintEnd_toEndOf="@id/tvNombreCampeonato"
+            android:text="Coche: 0"/>
+
+        <!-- Flecha -->
+        <ImageView
+            android:id="@+id/arrowRight"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            app:srcCompat="@drawable/ic_arrow_right"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

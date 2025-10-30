@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1E120C"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".CarsFragment">
+
+    <!-- Buscador -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="#2B1A11"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="12dp"
+        android:layout_marginBottom="12dp"
+        android:backgroundTint="#2B1A11"
+        android:clipToOutline="true">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_search" />
+
+        <EditText
+            android:id="@+id/etBuscarCar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:hint="Search by car or driver..."
+            android:textColorHint="#BDBDBD"
+            android:textColor="@android:color/white"
+            android:paddingStart="8dp" />
+    </LinearLayout>
+
+    <!-- Lista de coches -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerCars"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        tools:listitem="@layout/item_car" />
+</LinearLayout>
