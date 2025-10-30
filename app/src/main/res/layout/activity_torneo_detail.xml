@@ -12,6 +12,7 @@
         android:id="@+id/toolbarTorneo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
         android:backgroundTint="#1E120C"
         android:title="GT World Challenge 2024"
         android:titleTextColor="@android:color/white"

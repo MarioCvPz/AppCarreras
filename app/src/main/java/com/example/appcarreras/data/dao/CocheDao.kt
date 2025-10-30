@@ -18,6 +18,8 @@ interface CocheDao {
     @Query("UPDATE coches SET status = :nuevoStatus WHERE idCoche = :idCoche")
     suspend fun actualizarStatus(idCoche: Int, nuevoStatus: String)
 
+    @Query("SELECT COUNT(*) FROM coches WHERE torneoId = :torneoId")
+    suspend fun contarCochesPorTorneo(torneoId: Long): Int
 
     @Delete
     suspend fun eliminarCoche(coche: CocheEntity)

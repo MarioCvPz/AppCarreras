@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/tvTituloDialogo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_title_new_race"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/etNombreCarrera"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/hint_race_name"
+        android:inputType="textCapWords"
+        android:backgroundTint="#FF7A1A"
+        android:textColor="@android:color/white"
+        android:textColorHint="#BDBDBD" />
+
+    <EditText
+        android:id="@+id/etFechaCarrera"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="@string/hint_race_date"
+        android:focusable="false"
+        android:clickable="true"
+        android:inputType="date"
+        android:backgroundTint="#FF7A1A"
+        android:textColor="@android:color/white"
+        android:textColorHint="#BDBDBD" />
+
+</LinearLayout>

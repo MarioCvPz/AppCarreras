@@ -18,5 +18,6 @@ import androidx.room.PrimaryKey
 data class CarreraEntity(
     @PrimaryKey(autoGenerate = true) val idCarrera: Int = 0,
     val torneoId: Int,
-    val nombreCarrera: String
+    val nombreCarrera: String,
+    val fechaCarrera: String
 )

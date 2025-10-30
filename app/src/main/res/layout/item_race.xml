@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginBottom="12dp"
     app:cardCornerRadius="16dp"
     app:cardBackgroundColor="#2B1A11"
@@ -18,7 +19,7 @@
             android:id="@+id/tvRaceName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Race 1 - Monza"
+            tools:text="Race 1 - Monza"
             android:textColor="@android:color/white"
             android:textStyle="bold"
             android:textSize="16sp" />
@@ -27,7 +28,7 @@
             android:id="@+id/tvRaceDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="April 12, 2025"
+            tools:text="April 12, 2025"
             android:textColor="#BDBDBD"
             android:textSize="14sp"
             android:layout_marginTop="4dp" />

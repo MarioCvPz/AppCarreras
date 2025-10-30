@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     // Base de datos
     private val db by lazy { DatabaseProvider.getDatabase(this) }
     private val torneoDao by lazy { db.torneoDao() }
+    private val cocheDao by lazy { db.cocheDao() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +55,7 @@ class MainActivity : AppCompatActivity() {
             val torneos = torneoDao.obtenerTorneos()
 
             // Convertimos TorneoEntity -> Campeonato (para el adaptador actual)
-            val listaCampeonatos = torneos.map { Campeonato(it.nombre, 0, it.idTorneo) }
+            val listaCampeonatos = convertirATorneosConConteo(torneos)
 
             withContext(Dispatchers.Main) {
                 adapter.actualizarLista(listaCampeonatos)
@@ -85,7 +86,7 @@ class MainActivity : AppCompatActivity() {
 
                         // 2️⃣ Volvemos a cargar la lista actualizada
                         val torneos = torneoDao.obtenerTorneos()
-                        val listaCampeonatos = torneos.map { Campeonato(it.nombre, 0, it.idTorneo) }
+                        val listaCampeonatos = convertirATorneosConConteo(torneos)
 
                         withContext(Dispatchers.Main) {
                             adapter.actualizarLista(listaCampeonatos)
@@ -137,7 +138,7 @@ class MainActivity : AppCompatActivity() {
                 torneoDao.buscarTorneosPorNombre(nombre)
             }
 
-            val listaCampeonatos = torneosFiltrados.map { Campeonato(it.nombre, 0, it.idTorneo) }
+            val listaCampeonatos = convertirATorneosConConteo(torneosFiltrados)
 
             withContext(Dispatchers.Main) {
                 adapter.actualizarLista(listaCampeonatos)
@@ -145,4 +146,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private suspend fun convertirATorneosConConteo(torneos: List<TorneoEntity>): List<Campeonato> {
+        return torneos.map {
+            val numCoches = cocheDao.contarCochesPorTorneo(it.idTorneo.toLong())
+            Campeonato(it.nombre, numCoches, it.idTorneo)
+        }
+    }
 }
