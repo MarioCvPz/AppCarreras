@@ -1,4 +1,4 @@
-package com.example.appcarreras
+package com.example.appcarreras.ui.torneo
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge

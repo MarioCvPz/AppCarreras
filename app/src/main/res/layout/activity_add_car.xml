@@ -7,7 +7,7 @@
     android:padding="16dp"
     android:layout_height="match_parent"
     android:background="#0F0B07"
-    tools:context=".AddCarActivity">
+    tools:context=".ui.cars.AddCarActivity">
 
     <!-- Toolbar -->
     <com.google.android.material.appbar.MaterialToolbar

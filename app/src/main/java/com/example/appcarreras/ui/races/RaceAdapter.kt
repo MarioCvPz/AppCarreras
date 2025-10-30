@@ -1,10 +1,11 @@
-package com.example.appcarreras
+package com.example.appcarreras.ui.races
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.appcarreras.R
 
 class RaceAdapter(private val races: List<Race>) :
     RecyclerView.Adapter<RaceAdapter.RaceViewHolder>() {

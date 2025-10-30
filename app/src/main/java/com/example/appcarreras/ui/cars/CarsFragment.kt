@@ -1,4 +1,4 @@
-package com.example.appcarreras
+package com.example.appcarreras.ui.cars
 
 import android.content.Intent
 import android.os.Bundle

@@ -1,17 +1,22 @@
-package com.example.appcarreras
+package com.example.appcarreras.ui.main
 
 import android.os.Bundle
+import android.view.Menu
 import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.appcarreras.ui.torneo.Campeonato
+import com.example.appcarreras.ui.torneo.CampeonatoAdapter
+import com.example.appcarreras.R
 import com.example.appcarreras.data.database.DatabaseProvider
 import com.example.appcarreras.data.entity.TorneoEntity
 import com.example.appcarreras.databinding.ActivityMainBinding
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
@@ -100,16 +105,16 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    override fun onCreateOptionsMenu(menu: android.view.Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_campeonatos, menu)
 
         val searchItem = menu?.findItem(R.id.action_search)
-        val searchView = searchItem?.actionView as? androidx.appcompat.widget.SearchView
+        val searchView = searchItem?.actionView as? SearchView
 
         searchView?.queryHint = "Buscar torneo..."
 
         searchView?.setOnQueryTextListener(object :
-            androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 filtrarTorneos(query.orEmpty())
                 return true

@@ -1,4 +1,4 @@
-package com.example.appcarreras
+package com.example.appcarreras.ui.torneo
 
 data class Campeonato(
     val nombre: String,

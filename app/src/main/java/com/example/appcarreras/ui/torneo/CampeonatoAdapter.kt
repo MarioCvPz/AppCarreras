@@ -1,4 +1,4 @@
-package com.example.appcarreras
+package com.example.appcarreras.ui.torneo
 
 import android.content.Context
 import android.content.Intent
@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.appcarreras.R
 
 class CampeonatoAdapter(
     private val context: Context,

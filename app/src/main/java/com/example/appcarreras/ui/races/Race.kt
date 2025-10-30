@@ -1,4 +1,4 @@
-package com.example.appcarreras
+package com.example.appcarreras.ui.races
 
 data class Race(
     val name: String,

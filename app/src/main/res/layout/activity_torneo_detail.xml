@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#1E120C"
     android:padding="16dp"
-    tools:context=".TorneoDetailActivity">
+    tools:context=".ui.torneo.TorneoDetailActivity">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbarTorneo"

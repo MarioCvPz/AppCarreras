@@ -1,4 +1,4 @@
-package com.example.appcarreras
+package com.example.appcarreras.ui.cars
 
 data class Car(
     val id: Int,

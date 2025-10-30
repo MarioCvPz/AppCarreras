@@ -12,13 +12,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCarreras">
         <activity
-            android:name=".AddCarActivity"
+            android:name=".ui.cars.AddCarActivity"
             android:exported="false" />
         <activity
-            android:name=".TorneoDetailActivity"
+            android:name=".ui.torneo.TorneoDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="true"
             tools:ignore="Instantiatable">
             <intent-filter>

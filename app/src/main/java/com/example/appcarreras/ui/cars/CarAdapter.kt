@@ -1,4 +1,4 @@
-package com.example.appcarreras
+package com.example.appcarreras.ui.cars
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.appcarreras.R
 import com.example.appcarreras.data.database.DatabaseProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

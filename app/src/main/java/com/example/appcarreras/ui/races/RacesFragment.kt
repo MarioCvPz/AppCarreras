@@ -1,4 +1,4 @@
-package com.example.appcarreras
+package com.example.appcarreras.ui.races
 
 import android.os.Bundle
 import android.util.Log
