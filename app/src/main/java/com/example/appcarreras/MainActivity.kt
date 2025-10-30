@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
             val torneos = torneoDao.obtenerTorneos()
 
             // Convertimos TorneoEntity -> Campeonato (para el adaptador actual)
-            val listaCampeonatos = torneos.map { Campeonato(it.nombre, 0) }
+            val listaCampeonatos = torneos.map { Campeonato(it.nombre, 0, it.idTorneo) }
 
             withContext(Dispatchers.Main) {
                 adapter.actualizarLista(listaCampeonatos)
@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
 
                         // 2️⃣ Volvemos a cargar la lista actualizada
                         val torneos = torneoDao.obtenerTorneos()
-                        val listaCampeonatos = torneos.map { Campeonato(it.nombre, 0) }
+                        val listaCampeonatos = torneos.map { Campeonato(it.nombre, 0, it.idTorneo) }
 
                         withContext(Dispatchers.Main) {
                             adapter.actualizarLista(listaCampeonatos)
@@ -132,7 +132,7 @@ class MainActivity : AppCompatActivity() {
                 torneoDao.buscarTorneosPorNombre(nombre)
             }
 
-            val listaCampeonatos = torneosFiltrados.map { Campeonato(it.nombre, 0) }
+            val listaCampeonatos = torneosFiltrados.map { Campeonato(it.nombre, 0, it.idTorneo) }
 
             withContext(Dispatchers.Main) {
                 adapter.actualizarLista(listaCampeonatos)

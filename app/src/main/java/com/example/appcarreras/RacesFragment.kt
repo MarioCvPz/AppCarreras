@@ -44,4 +44,15 @@ class RacesFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+    companion object {
+        private const val ARG_TORNEO_ID = "torneo_id"
+
+        fun newInstance(torneoId: Long): RacesFragment {
+            val fragment = RacesFragment()
+            val args = Bundle()
+            args.putLong(ARG_TORNEO_ID, torneoId)
+            fragment.arguments = args
+            return fragment
+        }
+    }
 }

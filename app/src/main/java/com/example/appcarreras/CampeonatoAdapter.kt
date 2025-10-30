@@ -33,6 +33,7 @@ class CampeonatoAdapter(
         holder.itemView.setOnClickListener {
             val intent = Intent(context, TorneoDetailActivity::class.java)
             intent.putExtra("nombreCampeonato", campeonato.nombre)
+            intent.putExtra("TORNEO_ID", campeonato.idTorneo.toLong())
             context.startActivity(intent)
         }
     }

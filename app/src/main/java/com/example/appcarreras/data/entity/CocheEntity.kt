@@ -17,9 +17,10 @@ import androidx.room.PrimaryKey
 )
 data class CocheEntity(
     @PrimaryKey(autoGenerate = true) val idCoche: Int = 0,
-    val torneoId: Int,
+    val torneoId: Long,
     val marca: String,
     val modelo: String,
     val color: String,
-    val dorsal: String
+    val dorsal: Int,
+    val status: String = "GREEN"
 )

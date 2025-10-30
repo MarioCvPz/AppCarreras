@@ -18,6 +18,7 @@ class TorneoDetailActivity : AppCompatActivity() {
 
         // Recuperar nombre del torneo desde el intent
         val nombreTorneo = intent.getStringExtra("nombreCampeonato") ?: "Tournament"
+        val torneoId = intent.getLongExtra("TORNEO_ID", -1L)
 
         // Configurar Toolbar
         setSupportActionBar(binding.toolbarTorneo)
@@ -28,7 +29,7 @@ class TorneoDetailActivity : AppCompatActivity() {
         }
 
         // Configurar ViewPager con Tabs
-        val adapter = ViewPagerAdapter(this)
+        val adapter = ViewPagerAdapter(this, torneoId)
         binding.viewPager.adapter = adapter
 
         val tabTitles = listOf("Cars", "Races")

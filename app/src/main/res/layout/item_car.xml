@@ -14,16 +14,22 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <ImageView
-            android:id="@+id/iconCar"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            app:srcCompat="@drawable/ic_car"
+        <!-- Dorsal grande -->
+        <TextView
+            android:id="@+id/tvDorsal"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:textColor="#FF7A1A"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:background="@drawable/bg_dorsal_circle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:tint="#FF7A1A" />
+            tools:text="44" />
 
+        <!-- Nombre coche -->
         <TextView
             android:id="@+id/tvCarName"
             android:layout_width="0dp"
@@ -32,11 +38,12 @@
             android:textStyle="bold"
             android:textSize="16sp"
             android:layout_marginStart="12dp"
-            app:layout_constraintStart_toEndOf="@id/iconCar"
+            app:layout_constraintStart_toEndOf="@id/tvDorsal"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@id/statusDot"
-            tools:text="#44 Lewis Hamilton" />
+            tools:text="Porsche 911 GT3" />
 
+        <!-- Color / Equipo -->
         <TextView
             android:id="@+id/tvTeamName"
             android:layout_width="0dp"
@@ -46,15 +53,19 @@
             app:layout_constraintStart_toStartOf="@id/tvCarName"
             app:layout_constraintTop_toBottomOf="@id/tvCarName"
             app:layout_constraintEnd_toEndOf="@id/tvCarName"
-            tools:text="Mercedes-AMG Petronas" />
+            tools:text="Racing Yellow" />
 
+        <!-- Estado del coche -->
         <View
             android:id="@+id/statusDot"
-            android:layout_width="12dp"
-            android:layout_height="12dp"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
             android:background="@drawable/bg_status_green"
+            android:clickable="true"
+            android:focusable="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

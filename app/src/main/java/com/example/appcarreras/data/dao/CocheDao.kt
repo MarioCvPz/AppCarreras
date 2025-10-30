@@ -12,6 +12,13 @@ interface CocheDao {
     @Query("SELECT * FROM coches WHERE torneoId = :torneoId")
     suspend fun obtenerCochesPorTorneo(torneoId: Int): List<CocheEntity>
 
+    @Query("SELECT EXISTS(SELECT 1 FROM coches WHERE torneoId = :torneoId AND dorsal = :dorsal)")
+    suspend fun existeDorsalEnTorneo(torneoId: Long, dorsal: Int): Boolean
+
+    @Query("UPDATE coches SET status = :nuevoStatus WHERE idCoche = :idCoche")
+    suspend fun actualizarStatus(idCoche: Int, nuevoStatus: String)
+
+
     @Delete
     suspend fun eliminarCoche(coche: CocheEntity)
 }
