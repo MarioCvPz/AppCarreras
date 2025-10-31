@@ -111,6 +111,7 @@ class AddIncidentActivity : AppCompatActivity() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             val coche = cocheDao.obtenerCochePorDorsalEnCarrera(carreraId, dorsal)
+                ?: cocheDao.obtenerCochePorDorsal(torneoId, dorsal)
             if (coche == null) {
                 withContext(Dispatchers.Main) {
                     setError(binding.tilCarNumber, getString(R.string.error_car_not_found))
