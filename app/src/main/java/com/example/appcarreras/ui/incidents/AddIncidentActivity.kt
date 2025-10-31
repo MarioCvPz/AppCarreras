@@ -21,6 +21,7 @@ class AddIncidentActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAddIncidentBinding
 
     private var torneoId: Long = -1L
+
     private var carreraId: Int = -1
     private var penaltyLaps = 0
 
@@ -109,7 +110,7 @@ class AddIncidentActivity : AppCompatActivity() {
         if (!isValid || dorsal == null) return
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val coche = cocheDao.obtenerCochePorDorsal(torneoId, dorsal)
+            val coche = cocheDao.obtenerCochePorDorsalEnCarrera(carreraId, dorsal)
             if (coche == null) {
                 withContext(Dispatchers.Main) {
                     setError(binding.tilCarNumber, getString(R.string.error_car_not_found))
