@@ -15,6 +15,7 @@
         android:layout_marginTop="12dp"
         android:backgroundTint="#1E120C"
         tools:title="GT World Challenge 2024"
+        app:titleTextColor="@color/white"
         android:titleTextColor="@android:color/white"
         app:navigationIcon="@drawable/ic_arrow_back"
         app:navigationIconTint="@android:color/white"

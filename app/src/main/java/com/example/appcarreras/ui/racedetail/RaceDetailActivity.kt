@@ -1,6 +1,7 @@
 package com.example.appcarreras.ui.racedetail
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Environment
 import android.widget.Toast
@@ -8,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.lifecycleScope
 import androidx.core.view.isVisible
 import com.example.appcarreras.R
@@ -69,6 +71,7 @@ class RaceDetailActivity : AppCompatActivity() {
         supportActionBar?.title = if (raceName.isNotEmpty()) raceName else getString(R.string.title_race_detail)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbarRace.subtitle = raceDate.takeIf { it.isNotEmpty() }
+        binding.toolbarRace.setSubtitleTextColor(Color.WHITE)
         binding.toolbarRace.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
