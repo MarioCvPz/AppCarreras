@@ -12,4 +12,10 @@
     <color name="incident_yellow">#FFC107</color>
     <color name="incident_red">#F44336</color>
     <color name="incident_blue">#2196F3</color>
+    <color name="trophy_red">#FF3B30</color>
+    <color name="trophy_yellow">#FFC107</color>
+    <color name="trophy_green">#4CAF50</color>
+    <color name="trophy_blue">#2196F3</color>
+    <color name="trophy_purple">#9C27B0</color>
+    <color name="trophy_orange">#FF9800</color>
 </resources>

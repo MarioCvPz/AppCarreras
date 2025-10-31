@@ -24,4 +24,138 @@
         android:backgroundTint="#FF7A1A"
         android:textColor="@android:color/white"
         android:textColorHint="#BDBDBD" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Color del trofeo"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        android:layout_marginTop="12dp"/>
+
+    <LinearLayout
+        android:id="@+id/layoutColorOptions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="8dp">
+
+        <FrameLayout
+            android:id="@+id/optRed"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="6dp"
+            android:background="@drawable/bg_color_circle_selector"
+            android:foreground="?attr/selectableItemBackgroundBorderless">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:backgroundTint="@color/trophy_red"
+                android:background="@android:color/white"
+                android:alpha="0.0"/>
+
+            <View
+                android:id="@+id/dotRed"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="6dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_color_circle_filled"
+                android:backgroundTint="@color/trophy_red" />
+        </FrameLayout>
+
+        <!-- Repite para el resto, cambiando ids y color -->
+        <FrameLayout
+            android:id="@+id/optYellow"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="6dp"
+            android:background="@drawable/bg_color_circle_selector"
+            android:foreground="?attr/selectableItemBackgroundBorderless">
+
+            <View
+                android:id="@+id/dotYellow"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="6dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_color_circle_filled"
+                android:backgroundTint="@color/trophy_yellow" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/optGreen"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="6dp"
+            android:background="@drawable/bg_color_circle_selector"
+            android:foreground="?attr/selectableItemBackgroundBorderless">
+
+            <View
+                android:id="@+id/dotGreen"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="6dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_color_circle_filled"
+                android:backgroundTint="@color/trophy_green"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/optBlue"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="6dp"
+            android:background="@drawable/bg_color_circle_selector"
+            android:foreground="?attr/selectableItemBackgroundBorderless">
+
+            <View
+                android:id="@+id/dotBlue"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="6dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_color_circle_filled"
+                android:backgroundTint="@color/trophy_blue"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/optPurple"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="6dp"
+            android:background="@drawable/bg_color_circle_selector"
+            android:foreground="?attr/selectableItemBackgroundBorderless">
+
+            <View
+                android:id="@+id/dotPurple"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="6dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_color_circle_filled"
+                android:backgroundTint="@color/trophy_purple"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/optOrange"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="6dp"
+            android:background="@drawable/bg_color_circle_selector"
+            android:foreground="?attr/selectableItemBackgroundBorderless">
+
+            <View
+                android:id="@+id/dotOrange"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="6dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_color_circle_filled"
+                android:backgroundTint="@color/trophy_orange"/>
+        </FrameLayout>
+    </LinearLayout>
+
 </LinearLayout>

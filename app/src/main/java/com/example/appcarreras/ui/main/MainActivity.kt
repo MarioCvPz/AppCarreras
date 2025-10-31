@@ -2,11 +2,14 @@ package com.example.appcarreras.ui.main
 
 import android.os.Bundle
 import android.view.Menu
+import android.view.View
 import android.widget.EditText
+import android.widget.FrameLayout
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.appcarreras.ui.torneo.Campeonato
@@ -73,6 +76,36 @@ class MainActivity : AppCompatActivity() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_nuevo_campeonato, null)
         val etNombre = dialogView.findViewById<EditText>(R.id.etNombreCampeonato)
 
+        // referencias a opciones
+        val optRed = dialogView.findViewById<FrameLayout>(R.id.optRed)
+        val optYellow = dialogView.findViewById<FrameLayout>(R.id.optYellow)
+        val optGreen = dialogView.findViewById<FrameLayout>(R.id.optGreen)
+        val optBlue = dialogView.findViewById<FrameLayout>(R.id.optBlue)
+        val optPurple = dialogView.findViewById<FrameLayout>(R.id.optPurple)
+        val optOrange = dialogView.findViewById<FrameLayout>(R.id.optOrange)
+
+        val opciones = listOf(optRed, optYellow, optGreen, optBlue, optPurple, optOrange)
+
+
+        var selectedColor = getColor(R.color.trophy_yellow)
+
+        fun marcarSeleccion(vSeleccionado: View) {
+            opciones.forEach { it.alpha = if (it == vSeleccionado) 1f else 0.5f }
+        }
+        // marca por defecto
+        fun colorDe(view: View): Int {
+            val tintList = view.backgroundTintList
+            return tintList?.defaultColor ?: getColor(R.color.trophy_yellow)
+        }
+
+        opciones.forEach { v ->
+            v.setOnClickListener {
+                selectedColor = colorDe(v)
+                marcarSeleccion(v)
+            }
+        }
+        marcarSeleccion(optYellow)
+
         val dialog = AlertDialog.Builder(this, R.style.CustomDialogTheme)
             .setView(dialogView)
             .setPositiveButton("Agregar", null)
@@ -80,28 +113,22 @@ class MainActivity : AppCompatActivity() {
             .create()
 
         dialog.setOnShowListener {
-            val botonPositivo = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            botonPositivo.setTextColor(resources.getColor(R.color.orange, null))
-            botonPositivo.setOnClickListener {
+            val btnOk = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            btnOk.setTextColor(resources.getColor(R.color.orange, null))
+            btnOk.setOnClickListener {
                 val nombre = etNombre.text.toString().trim()
-                if (nombre.isNotEmpty()) {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        // 1️⃣ Guardamos en la base de datos
-                        torneoDao.insertarTorneo(TorneoEntity(nombre = nombre))
-
-                        // 2️⃣ Volvemos a cargar la lista actualizada
-                        val torneos = torneoDao.obtenerTorneos()
-                        val listaCampeonatos = convertirATorneosConConteo(torneos)
-
-                        withContext(Dispatchers.Main) {
-                            adapter.actualizarLista(listaCampeonatos)
-                        }
-                    }
-
-                    dialog.dismiss()
-                } else {
+                if (nombre.isEmpty()) {
                     etNombre.error = "El nombre no puede estar vacío"
+                    return@setOnClickListener
                 }
+
+                lifecycleScope.launch(Dispatchers.IO) {
+                    torneoDao.insertarTorneo(TorneoEntity(nombre = nombre, colorIcono = selectedColor))
+                    val torneos = torneoDao.obtenerTorneos()
+                    val listaCampeonatos = convertirATorneosConConteo(torneos)
+                    withContext(Dispatchers.Main) { adapter.actualizarLista(listaCampeonatos) }
+                }
+                dialog.dismiss()
             }
 
             dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
@@ -110,6 +137,7 @@ class MainActivity : AppCompatActivity() {
 
         dialog.show()
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_campeonatos, menu)
@@ -154,7 +182,12 @@ class MainActivity : AppCompatActivity() {
     private suspend fun convertirATorneosConConteo(torneos: List<TorneoEntity>): List<Campeonato> {
         return torneos.map {
             val numCoches = cocheDao.contarCochesPorTorneo(it.idTorneo.toLong())
-            Campeonato(it.nombre, numCoches, it.idTorneo)
+            Campeonato(
+                nombre = it.nombre,
+                numCoches = numCoches,
+                idTorneo = it.idTorneo,
+                colorIcono = it.colorIcono // 👈 ahora sí pasa el color elegido
+            )
         }
     }
 }

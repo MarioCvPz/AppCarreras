@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "torneos")
 data class TorneoEntity(
     @PrimaryKey(autoGenerate = true) val idTorneo: Int = 0,
-    val nombre: String
+    val nombre: String,
+    val colorIcono: Int = 0xFFFFC107.toInt()
 
 )

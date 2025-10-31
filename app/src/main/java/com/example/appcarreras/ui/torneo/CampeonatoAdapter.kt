@@ -2,9 +2,11 @@ package com.example.appcarreras.ui.torneo
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.appcarreras.R
@@ -18,6 +20,8 @@ class CampeonatoAdapter(
     inner class CampeonatoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val nombreTextView: TextView = itemView.findViewById(R.id.tvNombreCampeonato)
         val detallesTextView: TextView = itemView.findViewById(R.id.tvDetallesCampeonato)
+        val iconTrophy: ImageView = itemView.findViewById(R.id.iconTrophy) // 👈 añadimos referencia
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CampeonatoViewHolder {
@@ -30,6 +34,7 @@ class CampeonatoAdapter(
         val campeonato = listaFiltrada[position]
         holder.nombreTextView.text = campeonato.nombre
         holder.detallesTextView.text = "Coches: ${campeonato.numCoches}"
+        holder.iconTrophy.imageTintList = ColorStateList.valueOf(campeonato.colorIcono)
 
         holder.itemView.setOnClickListener {
             val intent = Intent(context, TorneoDetailActivity::class.java)
