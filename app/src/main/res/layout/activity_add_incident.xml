@@ -13,9 +13,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="#1E120C"
+        android:layout_marginTop="12dp"
         android:title="@string/title_add_incident"
         android:titleTextColor="@android:color/white"
         app:navigationIcon="@drawable/ic_arrow_back"
+        android:paddingVertical="8dp"
         app:navigationIconTint="@android:color/white"
         app:titleTextAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
 

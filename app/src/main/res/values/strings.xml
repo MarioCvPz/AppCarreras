@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">AppCarreras</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="error_nombre_vacio">El nombre no puede estar vacío</string>
     <string name="error_fecha_vacia">Selecciona una fecha</string>
@@ -13,7 +12,6 @@
     <string name="action_add_car_to_race">Agregar coche a carrera</string>
     <string name="action_add_incident">Agregar incidencia</string>
     <string name="action_export_excel">Exportar a Excel</string>
-    <string name="message_export_placeholder">Exportar a Excel estará disponible próximamente</string>
     <string name="empty_race_cars">No hay coches registrados aún</string>
     <string name="empty_race_incidents">Todavía no hay incidencias para esta carrera</string>
     <string name="label_penalty_laps_value">Penalty: %1$d</string>
@@ -28,6 +26,20 @@
     <string name="error_car_not_found">Coche no registrado en la carrera</string>
     <string name="message_incident_saved">Incidencia guardada correctamente</string>
     <string name="error_missing_race_information">No se pudo abrir la carrera seleccionada</string>
+    <string name="title_add_race_car">Agregar coche a carrera</string>
+    <string name="dialog_export_title">Exportar a Excel</string>
+    <string name="dialog_export_message">¿Deseas exportar las incidencias de esta carrera a un archivo Excel?</string>
+    <string name="dialog_export_positive">Exportar</string>
+    <string name="message_no_incidents_to_export">No hay incidencias para exportar</string>
+    <string name="message_export_success">Archivo exportado en: %1$s</string>
+    <string name="message_export_error">No se pudo exportar el archivo</string>
+    <string name="excel_sheet_incidents">Incidencias</string>
+    <string name="excel_header_car_number">Dorsal</string>
+    <string name="excel_header_car_name">Coche</string>
+    <string name="excel_header_incident_type">Tipo de incidencia</string>
+    <string name="excel_header_time">Hora</string>
+    <string name="excel_header_penalty">Penalización</string>
+    <string name="excel_default_race_name">carrera</string>
     <string-array name="incident_actions">
         <item>Salida de pista</item>
         <item>Avería</item>

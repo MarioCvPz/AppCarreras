@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.appcarreras.R
 import com.example.appcarreras.data.database.DatabaseProvider
 import com.example.appcarreras.data.entity.CocheEntity
 import com.example.appcarreras.databinding.ActivityAddCarBinding
@@ -20,6 +21,7 @@ class AddCarActivity : AppCompatActivity() {
     private val carDao by lazy { db.cocheDao() }
 
     private var torneoId: Long = -1L
+    private var carreraId: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,10 +36,18 @@ class AddCarActivity : AppCompatActivity() {
 
         // Obtener id del torneo desde el intent
         torneoId = intent.getLongExtra("TORNEO_ID", -1L)
+        carreraId = if (intent.hasExtra(EXTRA_CARRERA_ID)) {
+            intent.getIntExtra(EXTRA_CARRERA_ID, -1).takeIf { it != -1 }
+        } else {
+            null
+        }
         if (torneoId == -1L) {
             Toast.makeText(this, "Error: torneo no encontrado", Toast.LENGTH_SHORT).show()
             finish()
             return
+        }
+        if (carreraId != null) {
+            supportActionBar?.title = getString(R.string.title_add_race_car)
         }
 
         // Acción del botón "Save Car"
@@ -72,9 +82,15 @@ class AddCarActivity : AppCompatActivity() {
         binding.btnSaveCar.text = "Saving..."
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val existe = carDao.existeDorsalEnTorneo(torneoId, dorsal)
+            val existeEnTorneo = carDao.existeDorsalEnTorneo(torneoId, dorsal)
+            val carreraActual = carreraId
+            val existeEnCarrera = if (carreraActual != null) {
+                carDao.existeDorsalEnCarrera(carreraActual, dorsal) || existeEnTorneo
+            } else {
+                existeEnTorneo
+            }
+            if (existeEnCarrera) {
 
-            if (existe) {
                 withContext(Dispatchers.Main) {
                     binding.layoutDorsal.error = ""
                     binding.tvErrorDorsal.visibility = View.VISIBLE
@@ -89,15 +105,25 @@ class AddCarActivity : AppCompatActivity() {
                     marca = marca,
                     modelo = modelo,
                     color = color,
-                    dorsal = dorsal
+                    dorsal = dorsal,
+                    carreraId = carreraId
                 )
                 carDao.insertarCoche(nuevoCar)
 
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@AddCarActivity, "Car added successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@AddCarActivity,
+                        "Car added successfully",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     finish()
                 }
             }
+
         }
+    }
+
+    companion object {
+        const val EXTRA_CARRERA_ID = "CARRERA_ID"
     }
 }

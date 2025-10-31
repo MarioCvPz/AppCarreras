@@ -22,5 +22,6 @@ data class CocheEntity(
     val modelo: String,
     val color: String,
     val dorsal: Int,
-    val status: String = "GREEN"
+    val status: String = "GREEN",
+    val carreraId: Int? = null,
 )

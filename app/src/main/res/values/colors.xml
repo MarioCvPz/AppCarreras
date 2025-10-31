@@ -9,4 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="orange">#ED5214</color>
     <color name="red">#F40E00</color>
+    <color name="incident_yellow">#FFC107</color>
+    <color name="incident_red">#F44336</color>
+    <color name="incident_blue">#2196F3</color>
 </resources>

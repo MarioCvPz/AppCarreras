@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:padding="16dp"
     android:layout_height="match_parent"
-    android:background="#0F0B07"
+    android:background="#1E120C"
     tools:context=".ui.cars.AddCarActivity">
 
     <!-- Toolbar -->
@@ -55,13 +55,12 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:boxBackgroundColor="#1E120C"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
+                app:boxBackgroundColor="#2B1A11"
                 app:boxCornerRadiusBottomEnd="12dp"
-                app:boxStrokeColor="#3A2B22"
-                app:hintTextColor="#9E8C7F">
+                app:hintTextColor="@color/white">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etMarca"
@@ -69,6 +68,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/white"
                     android:textColorHint="#8E8E8E"
+                    android:hint="Marca coche"
                     android:inputType="textCapWords" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -85,19 +85,19 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:boxBackgroundColor="#1E120C"
+                app:boxBackgroundColor="#2B1A11"
+                app:hintTextColor="@color/white"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxStrokeColor="#3A2B22"
-                app:hintTextColor="#9E8C7F">
+                app:boxCornerRadiusBottomEnd="12dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etModelo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/white"
+                    android:hint="Modelo coche"
                     android:textColorHint="#8E8E8E"
                     android:inputType="textCapWords" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -115,13 +115,13 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:boxBackgroundColor="#1E120C"
+                app:boxBackgroundColor="#2B1A11"
                 app:boxCornerRadiusTopStart="12dp"
+                android:hint="Color coche"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusBottomEnd="12dp"
-                app:boxStrokeColor="#3A2B22"
-                app:hintTextColor="#9E8C7F">
+                app:hintTextColor="@color/white">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etColor"
@@ -146,13 +146,12 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:boxBackgroundColor="#1E120C"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusBottomEnd="12dp"
-                app:boxStrokeColor="#3A2B22"
-                app:hintTextColor="#9E8C7F"
+                app:boxBackgroundColor="#2B1A11"
+                app:hintTextColor="@color/white"
                 app:errorEnabled="true"
                 app:errorTextColor="@color/red">
 
@@ -161,6 +160,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/white"
+                    android:hint="Dorsal coche"
                     android:textColorHint="#8E8E8E"
                     android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>

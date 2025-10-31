@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.appcarreras"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -63,4 +63,6 @@ dependencies {
 
 // Optional: para usar coroutines (suspend fun)
     implementation ("androidx.room:room-ktx:$room_version")
+
+    implementation("org.apache.poi:poi-ooxml:5.2.5")
 }
