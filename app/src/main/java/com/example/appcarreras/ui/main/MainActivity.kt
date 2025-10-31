@@ -49,6 +49,11 @@ class MainActivity : AppCompatActivity() {
         binding.fabAdd.setOnClickListener { mostrarDialogoNuevoCampeonato() }
     }
 
+    override fun onResume() {
+        super.onResume()
+        cargarTorneosDesdeBD()
+    }
+
     /** Carga todos los torneos guardados en la base de datos y los muestra en el RecyclerView */
     private fun cargarTorneosDesdeBD() {
         lifecycleScope.launch(Dispatchers.IO) {

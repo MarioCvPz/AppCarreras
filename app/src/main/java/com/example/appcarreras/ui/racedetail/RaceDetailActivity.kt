@@ -1,33 +1,33 @@
 package com.example.appcarreras.ui.racedetail
 
 import android.content.Intent
+import android.net.Uri
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Environment
 import android.widget.Toast
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.addCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.graphics.toColorInt
-import androidx.lifecycle.lifecycleScope
 import androidx.core.view.isVisible
+import androidx.documentfile.provider.DocumentFile
+import androidx.lifecycle.lifecycleScope
 import com.example.appcarreras.R
+import com.example.appcarreras.data.dao.IncidenciaDao
 import com.example.appcarreras.data.database.DatabaseProvider
 import com.example.appcarreras.databinding.ActivityRaceDetailBinding
 import com.example.appcarreras.ui.cars.AddCarActivity
 import com.example.appcarreras.ui.incidents.AddIncidentActivity
 import com.google.android.material.tabs.TabLayoutMediator
-import java.io.File
-import java.io.FileOutputStream
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
-
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 class RaceDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRaceDetailBinding
@@ -40,6 +40,14 @@ class RaceDetailActivity : AppCompatActivity() {
 
     private val db by lazy { DatabaseProvider.getDatabase(this) }
     private val incidenciaDao by lazy { db.incidenciaDao() }
+
+    private val sharedPrefs by lazy { getSharedPreferences(PREFS_NAME, MODE_PRIVATE) }
+
+    private val openDirectoryLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocumentTree(),
+    ) { uri ->
+        uri?.let { handleDirectorySelected(it) }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -128,17 +136,31 @@ class RaceDetailActivity : AppCompatActivity() {
     }
 
     private fun mostrarDialogoExportar() {
+        val currentFolder = getExportDirectoryLabel()
+        val message = currentFolder?.let {
+            getString(R.string.dialog_export_message_with_folder, it)
+        } ?: getString(R.string.dialog_export_message_no_folder)
+
         AlertDialog.Builder(this)
             .setTitle(R.string.dialog_export_title)
-            .setMessage(R.string.dialog_export_message)
+            .setMessage(message)
             .setPositiveButton(R.string.dialog_export_positive) { _, _ ->
                 exportarIncidenciasAExcel()
+            }
+            .setNeutralButton(R.string.dialog_export_choose_folder) { _, _ ->
+                abrirSelectorDirectorio()
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
     }
 
     private fun exportarIncidenciasAExcel() {
+        val exportDirUri = getSelectedExportDirectoryUri()
+        if (exportDirUri == null) {
+            Toast.makeText(this, R.string.message_export_no_directory, Toast.LENGTH_SHORT).show()
+            return
+        }
+        val exportDirectoryLabel = getExportDirectoryLabel(exportDirUri)
         lifecycleScope.launch {
             val incidencias = withContext(Dispatchers.IO) {
                 incidenciaDao.obtenerIncidenciasConCoche(torneoId.toInt(), carreraId)
@@ -151,68 +173,181 @@ class RaceDetailActivity : AppCompatActivity() {
 
             val resultado = withContext(Dispatchers.IO) {
                 runCatching {
-                    val workbook = XSSFWorkbook()
-                    val sheet = workbook.createSheet(getString(R.string.excel_sheet_incidents))
-
-                    val headerRow = sheet.createRow(0)
-                    headerRow.createCell(0).setCellValue(getString(R.string.excel_header_car_number))
-                    headerRow.createCell(1).setCellValue(getString(R.string.excel_header_car_name))
-                    headerRow.createCell(2).setCellValue(getString(R.string.excel_header_incident_type))
-                    headerRow.createCell(3).setCellValue(getString(R.string.excel_header_time))
-                    headerRow.createCell(4).setCellValue(getString(R.string.excel_header_penalty))
-
-                    incidencias.forEachIndexed { index, item ->
-                        val row = sheet.createRow(index + 1)
-                        row.createCell(0).setCellValue(item.dorsal.toString())
-                        val carName = "${item.marca} ${item.modelo}".trim()
-                        row.createCell(1).setCellValue(carName)
-                        row.createCell(2).setCellValue(item.incidencia.tipoIncidencia)
-                        val time = String.format(Locale.getDefault(), "%02d:%02d", item.incidencia.hora, item.incidencia.minuto)
-                        row.createCell(3).setCellValue(time)
-                        row.createCell(4).setCellValue(item.incidencia.vueltasPenalizacion.toString())
-                    }
-
-                    for (i in 0..4) {
-                        sheet.autoSizeColumn(i)
-                    }
-
-                    val exportDir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) ?: filesDir
-                    if (!exportDir.exists()) {
-                        exportDir.mkdirs()
-                    }
-
+                    val csvContent = buildCsvContent(incidencias)
                     val sanitizedName = if (raceName.isNotEmpty()) {
                         raceName.replace("[^A-Za-z0-9_]".toRegex(), "_")
                     } else {
                         getString(R.string.excel_default_race_name)
                     }
                     val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-                    val fileName = "incidencias_${sanitizedName}_$timestamp.xlsx"
-                    val file = File(exportDir, fileName)
-                    FileOutputStream(file).use { output ->
-                        workbook.write(output)
-                    }
-                    workbook.close()
-                    file
+                    val fileName = "incidencias_${sanitizedName}_$timestamp.csv"
+                    val directory = DocumentFile.fromTreeUri(this@RaceDetailActivity, exportDirUri)
+                        ?: throw IllegalStateException("Invalid directory")
+
+                    directory.findFile(fileName)?.delete()
+
+                    val file = directory.createFile("text/csv", fileName)
+                        ?: throw IllegalStateException("Unable to create file")
+
+                    contentResolver.openOutputStream(file.uri)?.bufferedWriter()?.use { writer ->
+                        writer.write(csvContent)
+                    } ?: throw IllegalStateException("Unable to open output stream")
+
+                    val previewPath = createPreviewCsv(csvContent, fileName)
+
+                    ExportResult(file.name ?: fileName, previewPath)
                 }.getOrNull()
             }
 
             if (resultado != null) {
+                val displayPath = if (exportDirectoryLabel.isNotEmpty()) {
+                    "$exportDirectoryLabel/${resultado.fileDisplayName}"
+                } else {
+                    resultado.fileDisplayName
+                }
                 Toast.makeText(
                     this@RaceDetailActivity,
-                    getString(R.string.message_export_success, resultado.absolutePath),
+                    getString(R.string.message_export_success, displayPath),
                     Toast.LENGTH_LONG
                 ).show()
+                resultado.previewPath?.let { preview ->
+                    Log.d(TAG, "Preview CSV saved at $preview")
+                    Toast.makeText(
+                        this@RaceDetailActivity,
+                        getString(R.string.message_export_preview_location, preview),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             } else {
                 Toast.makeText(this@RaceDetailActivity, R.string.message_export_error, Toast.LENGTH_SHORT).show()
             }
         }
     }
 
+    private fun abrirSelectorDirectorio() {
+        openDirectoryLauncher.launch(getSelectedExportDirectoryUri())
+    }
+
+    private fun handleDirectorySelected(uri: Uri) {
+        try {
+            val previousUriString = sharedPrefs.getString(KEY_EXPORT_TREE_URI, null)
+            contentResolver.takePersistableUriPermission(
+                uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
+            )
+            val previousUri = previousUriString?.let(Uri::parse)
+            if (previousUri != null && previousUri != uri) {
+                releasePersistedPermission(previousUri)
+            }
+            sharedPrefs.edit().putString(KEY_EXPORT_TREE_URI, uri.toString()).apply()
+            Toast.makeText(
+                this,
+                getString(R.string.message_export_directory_saved, getExportDirectoryLabel(uri)),
+                Toast.LENGTH_SHORT
+            ).show()
+        } catch (securityException: SecurityException) {
+            Toast.makeText(this, R.string.message_export_directory_error, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun releasePersistedPermission(uri: Uri) {
+        contentResolver.persistedUriPermissions.firstOrNull { it.uri == uri }?.let { permission ->
+            var flags = 0
+            if (permission.isReadPermission) flags = flags or Intent.FLAG_GRANT_READ_URI_PERMISSION
+            if (permission.isWritePermission) flags = flags or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            contentResolver.releasePersistableUriPermission(permission.uri, flags)
+        }
+    }
+
+    private fun getSelectedExportDirectoryUri(): Uri? {
+        val uriString = sharedPrefs.getString(KEY_EXPORT_TREE_URI, null) ?: return null
+        val uri = Uri.parse(uriString)
+        val hasPermission = contentResolver.persistedUriPermissions.any { persisted ->
+            persisted.uri == uri && persisted.isWritePermission
+        }
+        return if (hasPermission) {
+            uri
+        } else {
+            sharedPrefs.edit().remove(KEY_EXPORT_TREE_URI).apply()
+            null
+        }
+    }
+
+    private fun getExportDirectoryLabel(): String? {
+        val uri = getSelectedExportDirectoryUri() ?: return null
+        return getExportDirectoryLabel(uri)
+    }
+
+    private fun getExportDirectoryLabel(uri: Uri): String {
+        val document = DocumentFile.fromTreeUri(this, uri)
+        val documentName = document?.name
+        if (!documentName.isNullOrEmpty()) {
+            return documentName
+        }
+        val lastSegment = uri.lastPathSegment
+        return if (!lastSegment.isNullOrEmpty()) {
+            lastSegment
+        } else {
+            uri.toString()
+        }
+    }
+
+    private fun buildCsvContent(incidencias: List<IncidenciaDao.IncidenciaConCoche>): String {
+        val headers = listOf(
+            getString(R.string.excel_header_car_number),
+            getString(R.string.excel_header_car_name),
+            getString(R.string.excel_header_incident_type),
+            getString(R.string.excel_header_time),
+            getString(R.string.excel_header_penalty),
+        )
+        return buildString {
+            appendLine(headers.joinToString(separator = ",") { escapeCsv(it) })
+            incidencias.forEach { item ->
+                val carName = "${item.marca} ${item.modelo}".trim()
+                val time = String.format(
+                    Locale.getDefault(),
+                    "%02d:%02d",
+                    item.incidencia.hora,
+                    item.incidencia.minuto,
+                )
+                val values = listOf(
+                    item.dorsal.toString(),
+                    carName,
+                    item.incidencia.tipoIncidencia,
+                    time,
+                    item.incidencia.vueltasPenalizacion.toString(),
+                )
+                appendLine(values.joinToString(separator = ",") { escapeCsv(it) })
+            }
+        }
+    }
+
+    private fun createPreviewCsv(csvContent: String, fileName: String): String? {
+        return runCatching {
+            val prefix = fileName.substringBefore('.')
+                .takeIf { it.length >= 3 }
+                ?: "csv_preview"
+            val tempFile = File.createTempFile(prefix, ".csv", cacheDir)
+            tempFile.writeText(csvContent, Charsets.UTF_8)
+            tempFile.absolutePath
+        }.getOrNull()
+    }
+
+    private fun escapeCsv(value: String): String {
+        val escaped = value.replace("\"", "\"\"")
+        return "\"$escaped\""
+    }
+
+    private data class ExportResult(val fileDisplayName: String, val previewPath: String?)
+
     companion object {
         const val EXTRA_TORNEO_ID = "EXTRA_TORNEO_ID"
         const val EXTRA_RACE_ID = "EXTRA_RACE_ID"
         const val EXTRA_RACE_NAME = "EXTRA_RACE_NAME"
         const val EXTRA_RACE_DATE = "EXTRA_RACE_DATE"
+        private const val PREFS_NAME = "race_detail_prefs"
+        private const val KEY_EXPORT_TREE_URI = "key_export_tree_uri"
+        private const val TAG = "RaceDetailActivity"
     }
 }
+

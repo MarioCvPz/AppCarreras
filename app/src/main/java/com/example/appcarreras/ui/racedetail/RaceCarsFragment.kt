@@ -28,10 +28,12 @@ class RaceCarsFragment : Fragment() {
     private var torneoId: Long = -1L
     private val db by lazy { DatabaseProvider.getDatabase(requireContext()) }
     private val cocheDao by lazy { db.cocheDao() }
+    private var carreraId: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         torneoId = arguments?.getLong(ARG_TORNEO_ID) ?: -1L
+        carreraId = arguments?.getInt(ARG_CARRERA_ID) ?: -1
     }
 
     override fun onCreateView(
@@ -58,7 +60,15 @@ class RaceCarsFragment : Fragment() {
     private fun cargarCoches() {
         if (torneoId == -1L) return
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            val coches: List<CocheEntity> = cocheDao.obtenerCochesPorTorneo(torneoId.toInt())
+            val cochesCarrera: List<CocheEntity> = if (carreraId != -1) {
+                cocheDao.obtenerCochesPorCarrera(carreraId)
+            } else {
+                emptyList()
+            }
+            val cochesTorneo: List<CocheEntity> = cocheDao.obtenerCochesPorTorneo(torneoId.toInt())
+            val coches = (cochesCarrera + cochesTorneo)
+                .distinctBy { it.idCoche }
+                .sortedBy { it.dorsal }
             val mapped = coches.map {
                 Car(
                     id = it.idCoche,
@@ -85,11 +95,13 @@ class RaceCarsFragment : Fragment() {
 
     companion object {
         private const val ARG_TORNEO_ID = "ARG_TORNEO_ID"
+        private const val ARG_CARRERA_ID = "ARG_CARRERA_ID"
 
-        fun newInstance(torneoId: Long): RaceCarsFragment {
+        fun newInstance(torneoId: Long, carreraId: Int): RaceCarsFragment {
             val fragment = RaceCarsFragment()
             fragment.arguments = Bundle().apply {
                 putLong(ARG_TORNEO_ID, torneoId)
+                putInt(ARG_CARRERA_ID, carreraId)
             }
             return fragment
         }

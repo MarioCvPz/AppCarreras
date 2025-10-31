@@ -31,7 +31,7 @@
                 android:gravity="center"
                 android:paddingBottom="6dp"
                 android:text="14"
-                android:textColor="@android:color/white"
+                android:textColor="#FF7A1A"
                 android:textStyle="bold" />
 
             <TextView
@@ -76,7 +76,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Penalty: 1"
-                android:textColor="#BDBDBD"
+                android:textColor="@color/red"
                 android:textSize="14sp"
                 android:textStyle="bold" />
         </LinearLayout>

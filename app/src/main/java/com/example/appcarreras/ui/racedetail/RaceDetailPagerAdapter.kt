@@ -14,7 +14,7 @@ class RaceDetailPagerAdapter(
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> RaceCarsFragment.newInstance(torneoId)
+            0 -> RaceCarsFragment.newInstance(torneoId, carreraId)
             else -> RaceIncidentsFragment.newInstance(torneoId, carreraId)
         }
     }

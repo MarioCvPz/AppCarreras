@@ -22,7 +22,7 @@
             android:id="@+id/iconTrophy"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:backgroundTint="#FF7A1A"
+            android:backgroundTint="@color/incident_yellow"
             app:srcCompat="@drawable/ic_trophy"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
