@@ -63,32 +63,32 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:backgroundTint="#2B1A11"
+            android:backgroundTint="#994B18"
             android:text="@string/action_export_excel"
             android:textColor="@android:color/white"
             app:icon="@drawable/ic_file_download"
-            app:iconTint="#FF7A1A" />
+            app:iconTint="#2B1A11" />
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/fabAddIncident"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:backgroundTint="#2B1A11"
+            android:backgroundTint="#994B18"
             android:text="@string/action_add_incident"
             android:textColor="@android:color/white"
             app:icon="@drawable/ic_error"
-            app:iconTint="#FF7A1A" />
+            app:iconTint="#2B1A11" />
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/fabAddCar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="#2B1A11"
+            android:backgroundTint="#994B18"
             android:text="@string/action_add_car_to_race"
             android:textColor="@android:color/white"
             app:icon="@drawable/ic_car"
-            app:iconTint="#FF7A1A" />
+            app:iconTint="#2B1A11" />
 
     </LinearLayout>
 
