@@ -1,6 +1,7 @@
 package com.example.appcarreras.ui.main
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.widget.EditText
@@ -84,23 +85,27 @@ class MainActivity : AppCompatActivity() {
         val optPurple = dialogView.findViewById<FrameLayout>(R.id.optPurple)
         val optOrange = dialogView.findViewById<FrameLayout>(R.id.optOrange)
 
-        val opciones = listOf(optRed, optYellow, optGreen, optBlue, optPurple, optOrange)
+        val colorMap = mapOf(
+            optRed to ContextCompat.getColor(this, R.color.trophy_red),
+            optYellow to ContextCompat.getColor(this, R.color.trophy_yellow),
+            optGreen to ContextCompat.getColor(this, R.color.trophy_green),
+            optBlue to ContextCompat.getColor(this, R.color.trophy_blue),
+            optPurple to ContextCompat.getColor(this, R.color.trophy_purple),
+            optOrange to ContextCompat.getColor(this, R.color.trophy_orange)
+        )
 
+        val opciones = colorMap.keys.toList()
 
-        var selectedColor = getColor(R.color.trophy_yellow)
+        var selectedColor = colorMap[optYellow] ?: ContextCompat.getColor(this, R.color.trophy_yellow)
 
         fun marcarSeleccion(vSeleccionado: View) {
             opciones.forEach { it.alpha = if (it == vSeleccionado) 1f else 0.5f }
         }
-        // marca por defecto
-        fun colorDe(view: View): Int {
-            val tintList = view.backgroundTintList
-            return tintList?.defaultColor ?: getColor(R.color.trophy_yellow)
-        }
 
         opciones.forEach { v ->
             v.setOnClickListener {
-                selectedColor = colorDe(v)
+                selectedColor = colorMap[v] ?: ContextCompat.getColor(this, R.color.trophy_yellow)
+                Log.d("COLOR_DEBUG", "Color seleccionado: $selectedColor")
                 marcarSeleccion(v)
             }
         }

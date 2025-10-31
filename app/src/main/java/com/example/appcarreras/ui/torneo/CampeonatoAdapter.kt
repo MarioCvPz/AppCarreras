@@ -34,7 +34,7 @@ class CampeonatoAdapter(
         val campeonato = listaFiltrada[position]
         holder.nombreTextView.text = campeonato.nombre
         holder.detallesTextView.text = "Coches: ${campeonato.numCoches}"
-        holder.iconTrophy.imageTintList = ColorStateList.valueOf(campeonato.colorIcono)
+        holder.iconTrophy.setColorFilter(campeonato.colorIcono, android.graphics.PorterDuff.Mode.SRC_IN)
 
         holder.itemView.setOnClickListener {
             val intent = Intent(context, TorneoDetailActivity::class.java)
