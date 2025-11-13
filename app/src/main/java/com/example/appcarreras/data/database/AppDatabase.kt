@@ -18,5 +18,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun torneoDao(): TorneoDao
     abstract fun cocheDao(): CocheDao
     abstract fun carreraDao(): CarreraDao
+
     abstract fun incidenciaDao(): IncidenciaDao
 }
