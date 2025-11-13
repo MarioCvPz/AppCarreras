@@ -42,7 +42,12 @@ class MainActivity : AppCompatActivity() {
 
 
         // Inicializar RecyclerView
-        adapter = CampeonatoAdapter(this, mutableListOf())
+        adapter = CampeonatoAdapter(
+            this,
+            mutableListOf(),
+            onEditClick = { campeonato -> mostrarDialogoEditarCampeonato(campeonato) },
+            onDeleteClick = { campeonato -> mostrarDialogoEliminarCampeonato(campeonato) }
+        )
         binding.recyclerCampeonatos.layoutManager = LinearLayoutManager(this)
         binding.recyclerCampeonatos.adapter = adapter
 
@@ -194,5 +199,110 @@ class MainActivity : AppCompatActivity() {
                 colorIcono = it.colorIcono // 👈 ahora sí pasa el color elegido
             )
         }
+    }
+
+    /** Muestra el diálogo para editar un torneo existente */
+    private fun mostrarDialogoEditarCampeonato(campeonato: Campeonato) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val torneo = torneoDao.obtenerTorneoPorId(campeonato.idTorneo)
+            withContext(Dispatchers.Main) {
+                if (torneo == null) return@withContext
+
+                val dialogView = layoutInflater.inflate(R.layout.dialog_nuevo_campeonato, null)
+                val etNombre = dialogView.findViewById<EditText>(R.id.etNombreCampeonato)
+                etNombre.setText(torneo.nombre)
+
+                // referencias a opciones
+                val optRed = dialogView.findViewById<FrameLayout>(R.id.optRed)
+                val optYellow = dialogView.findViewById<FrameLayout>(R.id.optYellow)
+                val optGreen = dialogView.findViewById<FrameLayout>(R.id.optGreen)
+                val optBlue = dialogView.findViewById<FrameLayout>(R.id.optBlue)
+                val optPurple = dialogView.findViewById<FrameLayout>(R.id.optPurple)
+                val optOrange = dialogView.findViewById<FrameLayout>(R.id.optOrange)
+
+                val colorMap = mapOf(
+                    optRed to ContextCompat.getColor(this@MainActivity, R.color.trophy_red),
+                    optYellow to ContextCompat.getColor(this@MainActivity, R.color.trophy_yellow),
+                    optGreen to ContextCompat.getColor(this@MainActivity, R.color.trophy_green),
+                    optBlue to ContextCompat.getColor(this@MainActivity, R.color.trophy_blue),
+                    optPurple to ContextCompat.getColor(this@MainActivity, R.color.trophy_purple),
+                    optOrange to ContextCompat.getColor(this@MainActivity, R.color.trophy_orange)
+                )
+
+                val opciones = colorMap.keys.toList()
+                var selectedColor = torneo.colorIcono
+
+                fun marcarSeleccion(vSeleccionado: View) {
+                    opciones.forEach { it.alpha = if (it == vSeleccionado) 1f else 0.5f }
+                }
+
+                // Seleccionar el color actual
+                val colorActual = colorMap.entries.find { it.value == torneo.colorIcono }?.key
+                if (colorActual != null) {
+                    marcarSeleccion(colorActual)
+                } else {
+                    marcarSeleccion(optYellow)
+                }
+
+                opciones.forEach { v ->
+                    v.setOnClickListener {
+                        selectedColor = colorMap[v] ?: ContextCompat.getColor(this@MainActivity, R.color.trophy_yellow)
+                        marcarSeleccion(v)
+                    }
+                }
+
+                val dialog = AlertDialog.Builder(this@MainActivity, R.style.CustomDialogTheme)
+                    .setTitle(R.string.title_edit_torneo)
+                    .setView(dialogView)
+                    .setPositiveButton("Guardar", null)
+                    .setNegativeButton("Cancelar", null)
+                    .create()
+
+                dialog.setOnShowListener {
+                    val btnOk = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                    btnOk.setTextColor(resources.getColor(R.color.orange, null))
+                    btnOk.setOnClickListener {
+                        val nombre = etNombre.text.toString().trim()
+                        if (nombre.isEmpty()) {
+                            etNombre.error = "El nombre no puede estar vacío"
+                            return@setOnClickListener
+                        }
+
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            torneoDao.actualizarTorneo(torneo.copy(nombre = nombre, colorIcono = selectedColor))
+                            val torneos = torneoDao.obtenerTorneos()
+                            val listaCampeonatos = convertirATorneosConConteo(torneos)
+                            withContext(Dispatchers.Main) { adapter.actualizarLista(listaCampeonatos) }
+                        }
+                        dialog.dismiss()
+                    }
+
+                    dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setTextColor(resources.getColor(R.color.white, null))
+                }
+
+                dialog.show()
+            }
+        }
+    }
+
+    /** Muestra el diálogo de confirmación para eliminar un torneo */
+    private fun mostrarDialogoEliminarCampeonato(campeonato: Campeonato) {
+        AlertDialog.Builder(this, R.style.CustomDialogTheme)
+            .setTitle(R.string.dialog_delete_torneo_title)
+            .setMessage(getString(R.string.dialog_delete_torneo_message, campeonato.nombre))
+            .setPositiveButton(R.string.dialog_confirm) { _, _ ->
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val torneo = torneoDao.obtenerTorneoPorId(campeonato.idTorneo)
+                    torneo?.let {
+                        torneoDao.eliminarTorneo(it)
+                        val torneos = torneoDao.obtenerTorneos()
+                        val listaCampeonatos = convertirATorneosConConteo(torneos)
+                        withContext(Dispatchers.Main) { adapter.actualizarLista(listaCampeonatos) }
+                    }
+                }
+            }
+            .setNegativeButton(R.string.dialog_cancel, null)
+            .show()
     }
 }

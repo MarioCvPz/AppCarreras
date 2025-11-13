@@ -27,6 +27,12 @@ interface IncidenciaDao {
         """
     )
     suspend fun obtenerIncidenciasConCoche(torneoId: Int, carreraId: Int): List<IncidenciaConCoche>
+    @Update
+    suspend fun actualizarIncidencia(incidencia: IncidenciaEntity)
+
+    @Query("SELECT * FROM incidencias WHERE idIncidencia = :idIncidencia LIMIT 1")
+    suspend fun obtenerIncidenciaPorId(idIncidencia: Int): IncidenciaEntity?
+
     @Delete
     suspend fun eliminarIncidencia(incidencia: IncidenciaEntity)
 

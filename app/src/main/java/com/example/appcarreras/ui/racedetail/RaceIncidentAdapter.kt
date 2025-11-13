@@ -3,12 +3,15 @@ package com.example.appcarreras.ui.racedetail
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.appcarreras.R
 
 class RaceIncidentAdapter(
     private val incidents: MutableList<RaceIncident>,
+    private val onEditClick: (RaceIncident) -> Unit,
+    private val onDeleteClick: (RaceIncident) -> Unit
 ) : RecyclerView.Adapter<RaceIncidentAdapter.RaceIncidentViewHolder>() {
 
     inner class RaceIncidentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -17,6 +20,8 @@ class RaceIncidentAdapter(
         val incidentType: TextView = view.findViewById(R.id.tvIncidentType)
         val incidentTime: TextView = view.findViewById(R.id.tvIncidentTime)
         val penaltyLaps: TextView = view.findViewById(R.id.tvIncidentPenalty)
+        val btnEdit: ImageButton = view.findViewById(R.id.btnEditIncident)
+        val btnDelete: ImageButton = view.findViewById(R.id.btnDeleteIncident)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RaceIncidentViewHolder {
@@ -35,6 +40,8 @@ class RaceIncidentAdapter(
             R.string.label_penalty_laps_value,
             incident.penaltyLaps
         )
+        holder.btnEdit.setOnClickListener { onEditClick(incident) }
+        holder.btnDelete.setOnClickListener { onDeleteClick(incident) }
     }
 
     override fun getItemCount(): Int = incidents.size

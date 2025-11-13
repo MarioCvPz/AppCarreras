@@ -46,6 +46,22 @@
     <string name="excel_header_time">Hora</string>
     <string name="excel_header_penalty">Penalización</string>
     <string name="excel_default_race_name">carrera</string>
+    <string name="action_edit">Editar</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="dialog_delete_torneo_title">Eliminar Torneo</string>
+    <string name="dialog_delete_torneo_message">¿Estás seguro de que deseas eliminar el torneo \"%1$s\"?\n\nSe eliminarán también:\n- Todas las carreras del torneo\n- Todos los coches registrados\n- Todas las incidencias registradas\n\nEsta acción no se puede deshacer.</string>
+    <string name="dialog_delete_car_title">Eliminar Coche</string>
+    <string name="dialog_delete_car_message">¿Estás seguro de que deseas eliminar el coche #%1$d %2$s?\n\nEsta acción no se puede deshacer.</string>
+    <string name="dialog_delete_race_title">Eliminar Carrera</string>
+    <string name="dialog_delete_race_message">¿Estás seguro de que deseas eliminar la carrera \"%1$s\"?\n\nSe eliminarán también:\n- Todos los coches asignados a esta carrera\n- Todas las incidencias de esta carrera\n\nEsta acción no se puede deshacer.</string>
+    <string name="dialog_delete_incident_title">Eliminar Incidencia</string>
+    <string name="dialog_delete_incident_message">¿Estás seguro de que deseas eliminar esta incidencia?\n\nEsta acción no se puede deshacer.</string>
+    <string name="dialog_confirm">Confirmar</string>
+    <string name="dialog_cancel">Cancelar</string>
+    <string name="title_edit_torneo">Editar Torneo</string>
+    <string name="title_edit_car">Editar Coche</string>
+    <string name="title_edit_race">Editar Carrera</string>
+    <string name="title_edit_incident">Editar Incidencia</string>
     <string-array name="incident_actions">
         <item>Salida de pista</item>
         <item>Avería</item>

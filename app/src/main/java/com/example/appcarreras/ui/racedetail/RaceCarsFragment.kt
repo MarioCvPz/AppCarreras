@@ -1,5 +1,6 @@
 package com.example.appcarreras.ui.racedetail
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,9 +8,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.appcarreras.R
 import com.example.appcarreras.data.database.DatabaseProvider
 import com.example.appcarreras.data.entity.CocheEntity
 import com.example.appcarreras.databinding.FragmentRaceCarsBinding
+import com.example.appcarreras.ui.cars.AddCarActivity
 import com.example.appcarreras.ui.cars.Car
 import com.example.appcarreras.ui.cars.CarAdapter
 import com.example.appcarreras.ui.cars.CarStatus
@@ -43,7 +46,12 @@ class RaceCarsFragment : Fragment() {
     ): View {
         _binding = FragmentRaceCarsBinding.inflate(inflater, container, false)
 
-        adapter = CarAdapter(requireContext(), carsList)
+        adapter = CarAdapter(
+            requireContext(),
+            carsList,
+            onEditClick = { car -> editarCoche(car) },
+            onDeleteClick = { car -> eliminarCoche(car) }
+        )
         binding.recyclerRaceCars.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerRaceCars.adapter = adapter
 
@@ -84,6 +92,48 @@ class RaceCarsFragment : Fragment() {
                 val isEmpty = carsList.isEmpty()
                 binding.emptyState.visibility = if (isEmpty) View.VISIBLE else View.GONE
                 binding.recyclerRaceCars.visibility = if (isEmpty) View.GONE else View.VISIBLE
+            }
+        }
+    }
+
+    private fun editarCoche(car: Car) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val coche = cocheDao.obtenerCochePorId(car.id)
+            withContext(Dispatchers.Main) {
+                coche?.let {
+                    val intent = Intent(requireContext(), AddCarActivity::class.java)
+                    intent.putExtra("TORNEO_ID", torneoId)
+                    intent.putExtra(AddCarActivity.EXTRA_COCHE_ID, it.idCoche)
+                    intent.putExtra(AddCarActivity.EXTRA_IS_EDIT_MODE, true)
+                    if (it.carreraId != null) {
+                        intent.putExtra(AddCarActivity.EXTRA_CARRERA_ID, it.carreraId)
+                    } else if (carreraId != -1) {
+                        intent.putExtra(AddCarActivity.EXTRA_CARRERA_ID, carreraId)
+                    }
+                    startActivity(intent)
+                }
+            }
+        }
+    }
+
+    private fun eliminarCoche(car: Car) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val coche = cocheDao.obtenerCochePorId(car.id)
+            withContext(Dispatchers.Main) {
+                coche?.let {
+                    val nombreCompleto = "${it.marca} ${it.modelo}"
+                    androidx.appcompat.app.AlertDialog.Builder(requireContext(), R.style.CustomDialogTheme)
+                        .setTitle(R.string.dialog_delete_car_title)
+                        .setMessage(getString(R.string.dialog_delete_car_message, it.dorsal, nombreCompleto))
+                        .setPositiveButton(R.string.dialog_confirm) { _, _ ->
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                cocheDao.eliminarCoche(it)
+                                cargarCoches()
+                            }
+                        }
+                        .setNegativeButton(R.string.dialog_cancel, null)
+                        .show()
+                }
             }
         }
     }

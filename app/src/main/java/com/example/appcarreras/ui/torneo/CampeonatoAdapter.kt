@@ -6,6 +6,7 @@ import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -13,15 +14,18 @@ import com.example.appcarreras.R
 
 class CampeonatoAdapter(
     private val context: Context,
-    private val listaCampeonatos: MutableList<Campeonato>
+    private val listaCampeonatos: MutableList<Campeonato>,
+    private val onEditClick: (Campeonato) -> Unit,
+    private val onDeleteClick: (Campeonato) -> Unit
 ) : RecyclerView.Adapter<CampeonatoAdapter.CampeonatoViewHolder>() {
 
     private var listaFiltrada = listaCampeonatos.toMutableList()
     inner class CampeonatoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val nombreTextView: TextView = itemView.findViewById(R.id.tvNombreCampeonato)
         val detallesTextView: TextView = itemView.findViewById(R.id.tvDetallesCampeonato)
-        val iconTrophy: ImageView = itemView.findViewById(R.id.iconTrophy) // 👈 añadimos referencia
-
+        val iconTrophy: ImageView = itemView.findViewById(R.id.iconTrophy)
+        val btnEdit: ImageButton = itemView.findViewById(R.id.btnEditCampeonato)
+        val btnDelete: ImageButton = itemView.findViewById(R.id.btnDeleteCampeonato)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CampeonatoViewHolder {
@@ -41,6 +45,14 @@ class CampeonatoAdapter(
             intent.putExtra("nombreCampeonato", campeonato.nombre)
             intent.putExtra("TORNEO_ID", campeonato.idTorneo.toLong())
             context.startActivity(intent)
+        }
+
+        holder.btnEdit.setOnClickListener {
+            onEditClick(campeonato)
+        }
+
+        holder.btnDelete.setOnClickListener {
+            onDeleteClick(campeonato)
         }
     }
 

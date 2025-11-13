@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
@@ -92,8 +93,8 @@ class RaceDetailActivity : AppCompatActivity() {
 
         TabLayoutMediator(binding.tabLayoutRace, binding.viewPagerRace) { tab, position ->
             tab.text = when (position) {
-                0 -> getString(R.string.tab_title_race_cars)
-                else -> getString(R.string.tab_title_race_incidents)
+                0 -> getString(R.string.tab_title_race_incidents)
+                else -> getString(R.string.tab_title_race_cars)
             }
         }.attach()
     }
@@ -111,15 +112,8 @@ class RaceDetailActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
-        binding.fabAddIncident.setOnClickListener {
-            toggleFabMenu()
-            if (torneoId == -1L || carreraId == -1) return@setOnClickListener
-            val intent = Intent(this, AddIncidentActivity::class.java).apply {
-                putExtra(AddIncidentActivity.EXTRA_TORNEO_ID, torneoId)
-                putExtra(AddIncidentActivity.EXTRA_CARRERA_ID, carreraId)
-            }
-            startActivity(intent)
-        }
+        // El botón de agregar incidencia ahora está en el fragment
+        binding.fabAddIncident.visibility = View.GONE
         binding.fabExportExcel.setOnClickListener {
             toggleFabMenu()
             if (torneoId == -1L || carreraId == -1) return@setOnClickListener

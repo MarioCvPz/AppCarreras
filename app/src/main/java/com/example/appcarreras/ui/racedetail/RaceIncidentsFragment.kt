@@ -1,14 +1,18 @@
 package com.example.appcarreras.ui.racedetail
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.appcarreras.R
 import com.example.appcarreras.data.database.DatabaseProvider
 import com.example.appcarreras.databinding.FragmentRaceIncidentsBinding
+import com.example.appcarreras.ui.incidents.AddIncidentActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -42,9 +46,22 @@ class RaceIncidentsFragment : Fragment() {
     ): View {
         _binding = FragmentRaceIncidentsBinding.inflate(inflater, container, false)
 
-        adapter = RaceIncidentAdapter(incidents)
+        adapter = RaceIncidentAdapter(
+            incidents,
+            onEditClick = { incident -> editarIncidencia(incident) },
+            onDeleteClick = { incident -> eliminarIncidencia(incident) }
+        )
         binding.recyclerRaceIncidents.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerRaceIncidents.adapter = adapter
+
+        binding.btnAddIncident.setOnClickListener {
+            if (torneoId == -1L || carreraId == -1) return@setOnClickListener
+            val intent = Intent(requireContext(), AddIncidentActivity::class.java).apply {
+                putExtra(AddIncidentActivity.EXTRA_TORNEO_ID, torneoId)
+                putExtra(AddIncidentActivity.EXTRA_CARRERA_ID, carreraId)
+            }
+            startActivity(intent)
+        }
 
         cargarIncidencias()
 
@@ -79,6 +96,33 @@ class RaceIncidentsFragment : Fragment() {
                 binding.recyclerRaceIncidents.visibility = if (isEmpty) View.GONE else View.VISIBLE
             }
         }
+    }
+
+    private fun editarIncidencia(incident: RaceIncident) {
+        val intent = Intent(requireContext(), AddIncidentActivity::class.java).apply {
+            putExtra(AddIncidentActivity.EXTRA_TORNEO_ID, torneoId)
+            putExtra(AddIncidentActivity.EXTRA_CARRERA_ID, carreraId)
+            putExtra(AddIncidentActivity.EXTRA_INCIDENCIA_ID, incident.id)
+            putExtra(AddIncidentActivity.EXTRA_IS_EDIT_MODE, true)
+        }
+        startActivity(intent)
+    }
+
+    private fun eliminarIncidencia(incident: RaceIncident) {
+        AlertDialog.Builder(requireContext(), R.style.CustomDialogTheme)
+            .setTitle(R.string.dialog_delete_incident_title)
+            .setMessage(R.string.dialog_delete_incident_message)
+            .setPositiveButton(R.string.dialog_confirm) { _, _ ->
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val incidencia = incidenciaDao.obtenerIncidenciaPorId(incident.id)
+                    incidencia?.let {
+                        incidenciaDao.eliminarIncidencia(it)
+                        cargarIncidencias()
+                    }
+                }
+            }
+            .setNegativeButton(R.string.dialog_cancel, null)
+            .show()
     }
 
     override fun onDestroyView() {

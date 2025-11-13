@@ -18,4 +18,10 @@ interface TorneoDao {
     @Query("SELECT * FROM torneos WHERE nombre LIKE '%' || :nombre || '%' ORDER BY idTorneo DESC")
     suspend fun buscarTorneosPorNombre(nombre: String): List<TorneoEntity>
 
+    @Update
+    suspend fun actualizarTorneo(torneo: TorneoEntity)
+
+    @Query("SELECT * FROM torneos WHERE idTorneo = :idTorneo LIMIT 1")
+    suspend fun obtenerTorneoPorId(idTorneo: Int): TorneoEntity?
+
 }

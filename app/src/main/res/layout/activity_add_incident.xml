@@ -36,50 +36,104 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/label_incident_details"
+                android:layout_marginTop="24dp"
+                android:text="@string/hint_car_number"
                 android:textColor="@android:color/white"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilCarNumber"
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerDorsales"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:nestedScrollingEnabled="false" />
+
+            <TextView
+                android:id="@+id/tvNoCarsError"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Debe agregar coches antes de crear la incidencia"
+                android:textColor="@color/red"
+                android:textSize="14sp"
+                android:visibility="gone"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:hint="@string/hint_car_number"
-                app:boxBackgroundColor="#2B1A11"
-                app:hintTextColor="@color/white">
+                android:text="@string/hint_incident_action"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etCarNumber"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:textColor="@android:color/white"
-                    android:textColorHint="#BDBDBD" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilIncidentAction"
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/toggleGroupIncidentType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:hint="@string/hint_incident_action"
-                app:boxBackgroundColor="#2B1A11"
-                app:hintTextColor="@color/white">
+                android:layout_marginTop="12dp"
+                app:singleSelection="true"
+                app:selectionRequired="false">
 
-                <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                    android:id="@+id/etIncidentAction"
-                    android:layout_width="match_parent"
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/toggleSalidaPista"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:inputType="none"
-                    android:textColor="@android:color/white"
-                    android:textColorHint="#BDBDBD" />
+                    android:layout_weight="1"
+                    android:minHeight="56dp"
+                    android:text="Salida.P"
+                    android:textSize="12sp"
+                    android:textColor="@color/toggle_button_text"
+                    app:backgroundTint="@color/toggle_button_background"
+                    app:strokeColor="@color/primary_orange"
+                    app:strokeWidth="2dp" />
 
-            </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/toggleAveria"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:minHeight="56dp"
+                    android:text="Avería"
+                    android:textSize="12sp"
+                    android:textColor="@color/toggle_button_text"
+                    app:backgroundTint="@color/toggle_button_background"
+                    app:strokeColor="@color/primary_orange"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/toggleChoque"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:minHeight="56dp"
+                    android:text="Choque"
+                    android:textSize="12sp"
+                    android:textColor="@color/toggle_button_text"
+                    app:backgroundTint="@color/toggle_button_background"
+                    app:strokeColor="@color/primary_orange"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/toggleOtros"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:minHeight="56dp"
+                    android:text="Otros"
+                    android:textSize="12sp"
+                    android:textColor="@color/toggle_button_text"
+                    app:backgroundTint="@color/toggle_button_background"
+                    app:strokeColor="@color/primary_orange"
+                    app:strokeWidth="2dp" />
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
 
             <TextView
                 android:layout_width="wrap_content"

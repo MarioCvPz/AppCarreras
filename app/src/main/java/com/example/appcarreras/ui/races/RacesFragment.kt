@@ -44,7 +44,12 @@ class RacesFragment : Fragment() {
     ): View {
         _binding = FragmentRacesBinding.inflate(inflater, container, false)
 
-        adapter = RaceAdapter(racesList, ::abrirDetalleCarrera)
+        adapter = RaceAdapter(
+            racesList,
+            onRaceClick = ::abrirDetalleCarrera,
+            onEditClick = { race -> editarCarrera(race) },
+            onDeleteClick = { race -> eliminarCarrera(race) }
+        )
         binding.recyclerRaces.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerRaces.adapter = adapter
 
@@ -158,6 +163,108 @@ class RacesFragment : Fragment() {
             putExtra(RaceDetailActivity.EXTRA_RACE_DATE, race.date)
         }
         startActivity(intent)
+    }
+
+    private fun editarCarrera(race: Race) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val carrera = carreraDao.obtenerCarreraPorId(race.id)
+            withContext(Dispatchers.Main) {
+                carrera?.let {
+                    mostrarDialogoEditarCarrera(it)
+                }
+            }
+        }
+    }
+
+    private fun eliminarCarrera(race: Race) {
+        AlertDialog.Builder(requireContext(), R.style.CustomDialogTheme)
+            .setTitle(R.string.dialog_delete_race_title)
+            .setMessage(getString(R.string.dialog_delete_race_message, race.name))
+            .setPositiveButton(R.string.dialog_confirm) { _, _ ->
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val carrera = carreraDao.obtenerCarreraPorId(race.id)
+                    carrera?.let {
+                        carreraDao.eliminarCarrera(it)
+                        cargarCarreras()
+                    }
+                }
+            }
+            .setNegativeButton(R.string.dialog_cancel, null)
+            .show()
+    }
+
+    private fun mostrarDialogoEditarCarrera(carrera: CarreraEntity) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_nueva_carrera, null)
+        val etNombre = dialogView.findViewById<EditText>(R.id.etNombreCarrera)
+        val etFecha = dialogView.findViewById<EditText>(R.id.etFechaCarrera)
+
+        etNombre.setText(carrera.nombreCarrera)
+        etFecha.setText(carrera.fechaCarrera)
+
+        val mostrarSelectorFecha = {
+            val calendario = Calendar.getInstance()
+            DatePickerDialog(
+                requireContext(),
+                { _, year, month, dayOfMonth ->
+                    val fechaFormateada =
+                        String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year)
+                    etFecha.setText(fechaFormateada)
+                },
+                calendario.get(Calendar.YEAR),
+                calendario.get(Calendar.MONTH),
+                calendario.get(Calendar.DAY_OF_MONTH),
+            ).show()
+        }
+
+        etFecha.setOnClickListener { mostrarSelectorFecha() }
+        etFecha.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) mostrarSelectorFecha() }
+
+        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomDialogTheme)
+            .setTitle(R.string.title_edit_race)
+            .setView(dialogView)
+            .setPositiveButton("Guardar", null)
+            .setNegativeButton("Cancelar", null)
+            .create()
+
+        dialog.setOnShowListener {
+            val botonPositivo = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            botonPositivo.setTextColor(resources.getColor(R.color.orange, null))
+            botonPositivo.setOnClickListener {
+                val nombre = etNombre.text.toString().trim()
+                val fecha = etFecha.text.toString().trim()
+
+                var esValido = true
+                if (nombre.isEmpty()) {
+                    etNombre.error = getString(R.string.error_nombre_vacio)
+                    esValido = false
+                }
+                if (fecha.isEmpty()) {
+                    etFecha.error = getString(R.string.error_fecha_vacia)
+                    esValido = false
+                }
+
+                if (!esValido) return@setOnClickListener
+
+                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                    carreraDao.actualizarCarrera(
+                        carrera.copy(
+                            nombreCarrera = nombre,
+                            fechaCarrera = fecha
+                        )
+                    )
+
+                    withContext(Dispatchers.Main) {
+                        dialog.dismiss()
+                        cargarCarreras()
+                    }
+                }
+            }
+
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                .setTextColor(resources.getColor(R.color.white, null))
+        }
+
+        dialog.show()
     }
 
     override fun onDestroyView() {

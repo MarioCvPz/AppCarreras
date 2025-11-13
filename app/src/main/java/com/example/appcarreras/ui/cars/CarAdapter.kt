@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.appcarreras.R
@@ -12,8 +13,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class CarAdapter(private val context: Context,private val cars: MutableList<Car>) :
-    RecyclerView.Adapter<CarAdapter.CarViewHolder>() {
+class CarAdapter(
+    private val context: Context,
+    private val cars: MutableList<Car>,
+    private val onEditClick: ((Car) -> Unit)? = null,
+    private val onDeleteClick: ((Car) -> Unit)? = null
+) : RecyclerView.Adapter<CarAdapter.CarViewHolder>() {
 
     private var filteredList = cars.toMutableList()
 
@@ -22,6 +27,8 @@ class CarAdapter(private val context: Context,private val cars: MutableList<Car>
         val carName: TextView = view.findViewById(R.id.tvCarName)
         val teamName: TextView = view.findViewById(R.id.tvTeamName)
         val statusDot: View = view.findViewById(R.id.statusDot)
+        val btnEdit: ImageButton = view.findViewById(R.id.btnEditCar)
+        val btnDelete: ImageButton = view.findViewById(R.id.btnDeleteCar)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CarViewHolder {
@@ -60,6 +67,14 @@ class CarAdapter(private val context: Context,private val cars: MutableList<Car>
             CoroutineScope(Dispatchers.IO).launch {
                 cocheDao.actualizarStatus(car.id, nextStatus.name)
             }
+        }
+
+        holder.btnEdit.setOnClickListener {
+            onEditClick?.invoke(car)
+        }
+
+        holder.btnDelete.setOnClickListener {
+            onDeleteClick?.invoke(car)
         }
     }
 

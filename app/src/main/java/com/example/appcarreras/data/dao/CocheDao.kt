@@ -33,6 +33,12 @@ interface CocheDao {
     @Query("UPDATE coches SET status = :nuevoStatus WHERE idCoche = :idCoche")
     suspend fun actualizarStatus(idCoche: Int, nuevoStatus: String)
 
+    @Update
+    suspend fun actualizarCoche(coche: CocheEntity)
+
+    @Query("SELECT * FROM coches WHERE idCoche = :idCoche LIMIT 1")
+    suspend fun obtenerCochePorId(idCoche: Int): CocheEntity?
+
     @Delete
     suspend fun eliminarCoche(coche: CocheEntity)
 }

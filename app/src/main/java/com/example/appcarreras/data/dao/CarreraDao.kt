@@ -12,6 +12,12 @@ interface CarreraDao {
     @Query("SELECT * FROM carreras WHERE torneoId = :torneoId")
     suspend fun obtenerCarrerasPorTorneo(torneoId: Int): List<CarreraEntity>
 
+    @Update
+    suspend fun actualizarCarrera(carrera: CarreraEntity)
+
+    @Query("SELECT * FROM carreras WHERE idCarrera = :idCarrera LIMIT 1")
+    suspend fun obtenerCarreraPorId(idCarrera: Int): CarreraEntity?
+
     @Delete
     suspend fun eliminarCarrera(carrera: CarreraEntity)
 }
