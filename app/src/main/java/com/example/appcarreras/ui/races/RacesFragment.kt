@@ -116,17 +116,22 @@ class RacesFragment : Fragment() {
 
         val mostrarSelectorFecha = {
             val calendario = Calendar.getInstance()
-            DatePickerDialog(
+            val datePickerDialog = DatePickerDialog(
                 requireContext(),
                 { _, year, month, dayOfMonth ->
                     val fechaFormateada =
                         String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year)
                     etFecha.setText(fechaFormateada)
+                    // Limpiar error al seleccionar nueva fecha
+                    etFecha.error = null
                 },
                 calendario.get(Calendar.YEAR),
                 calendario.get(Calendar.MONTH),
                 calendario.get(Calendar.DAY_OF_MONTH),
-            ).show()
+            )
+            // Establecer fecha mínima como hoy (no permitir fechas pasadas)
+            datePickerDialog.datePicker.minDate = calendario.timeInMillis
+            datePickerDialog.show()
         }
 
         etFecha.setOnClickListener { mostrarSelectorFecha() }
@@ -153,6 +158,12 @@ class RacesFragment : Fragment() {
                 if (fecha.isEmpty()) {
                     etFecha.error = getString(R.string.error_fecha_vacia)
                     esValido = false
+                } else {
+                    // Validar que la fecha no sea anterior a hoy
+                    if (!esFechaValida(fecha)) {
+                        etFecha.error = getString(R.string.error_fecha_anterior)
+                        esValido = false
+                    }
                 }
 
                 if (!esValido) return@setOnClickListener
@@ -185,6 +196,40 @@ class RacesFragment : Fragment() {
         }
 
         dialog.show()
+    }
+
+    private fun esFechaValida(fechaTexto: String): Boolean {
+        return try {
+            // Formato esperado: dd/MM/yyyy
+            val partes = fechaTexto.split("/")
+            if (partes.size != 3) return false
+            
+            val dia = partes[0].toInt()
+            val mes = partes[1].toInt() - 1 // Calendar usa meses 0-11
+            val anio = partes[2].toInt()
+            
+            val fechaSeleccionada = Calendar.getInstance().apply {
+                set(Calendar.YEAR, anio)
+                set(Calendar.MONTH, mes)
+                set(Calendar.DAY_OF_MONTH, dia)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+            
+            val hoy = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+            
+            // La fecha seleccionada debe ser >= hoy
+            !fechaSeleccionada.before(hoy)
+        } catch (e: Exception) {
+            false
+        }
     }
 
     private fun abrirDetalleCarrera(race: Race) {
@@ -245,17 +290,22 @@ class RacesFragment : Fragment() {
 
         val mostrarSelectorFecha = {
             val calendario = Calendar.getInstance()
-            DatePickerDialog(
+            val datePickerDialog = DatePickerDialog(
                 requireContext(),
                 { _, year, month, dayOfMonth ->
                     val fechaFormateada =
                         String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year)
                     etFecha.setText(fechaFormateada)
+                    // Limpiar error al seleccionar nueva fecha
+                    etFecha.error = null
                 },
                 calendario.get(Calendar.YEAR),
                 calendario.get(Calendar.MONTH),
                 calendario.get(Calendar.DAY_OF_MONTH),
-            ).show()
+            )
+            // Establecer fecha mínima como hoy (no permitir fechas pasadas)
+            datePickerDialog.datePicker.minDate = calendario.timeInMillis
+            datePickerDialog.show()
         }
 
         etFecha.setOnClickListener { mostrarSelectorFecha() }
@@ -283,21 +333,34 @@ class RacesFragment : Fragment() {
                 if (fecha.isEmpty()) {
                     etFecha.error = getString(R.string.error_fecha_vacia)
                     esValido = false
+                } else {
+                    // Validar que la fecha no sea anterior a hoy
+                    if (!esFechaValida(fecha)) {
+                        etFecha.error = getString(R.string.error_fecha_anterior)
+                        esValido = false
+                    }
                 }
 
                 if (!esValido) return@setOnClickListener
 
                 viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                    carreraDao.actualizarCarrera(
-                        carrera.copy(
-                            nombreCarrera = nombre,
-                            fechaCarrera = fecha
+                    try {
+                        carreraDao.actualizarCarrera(
+                            carrera.copy(
+                                nombreCarrera = nombre,
+                                fechaCarrera = fecha
+                            )
                         )
-                    )
 
-                    withContext(Dispatchers.Main) {
-                        dialog.dismiss()
-                        cargarCarreras()
+                        withContext(Dispatchers.Main) {
+                            dialog.dismiss()
+                            cargarCarreras()
+                            mostrarExito(getString(R.string.success_operation_completed))
+                        }
+                    } catch (e: Exception) {
+                        withContext(Dispatchers.Main) {
+                            mostrarError(getString(R.string.error_database))
+                        }
                     }
                 }
             }
