@@ -109,14 +109,11 @@ class AddIncidentActivity : AppCompatActivity() {
 
     private fun setupDorsalSelector() {
         lifecycleScope.launch(Dispatchers.IO) {
-            // Obtener coches de la carrera y del torneo (igual que en RaceCarsFragment)
+            // Solo obtener coches creados específicamente para esta carrera
             val cochesCarrera = cocheDao.obtenerCochesPorCarrera(carreraId)
-            val cochesTorneo = cocheDao.obtenerCochesPorTorneo(torneoId.toInt())
             
-            // Combinar, eliminar duplicados y ordenar por dorsal
-            val coches = (cochesCarrera + cochesTorneo)
-                .distinctBy { it.idCoche }
-                .sortedBy { it.dorsal }
+            // Ordenar por dorsal
+            val coches = cochesCarrera.sortedBy { it.dorsal }
             
             val dorsales = coches.map { it.dorsal }
             
@@ -211,9 +208,8 @@ class AddIncidentActivity : AppCompatActivity() {
         if (!isValid) return
 
         lifecycleScope.launch(Dispatchers.IO) {
-            // Buscar primero en la carrera, luego en el torneo (igual que en RaceCarsFragment)
+            // Buscar el coche en esta carrera específica
             val coche = cocheDao.obtenerCochePorDorsalEnCarrera(carreraId, selectedDorsal!!)
-                ?: cocheDao.obtenerCochePorDorsal(torneoId, selectedDorsal!!)
             
             if (coche == null) {
                 withContext(Dispatchers.Main) {

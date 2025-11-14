@@ -75,16 +75,20 @@ class CarsFragment : Fragment() {
     private fun cargarCoches() {
         if (torneoId == -1L) return
         lifecycleScope.launch(Dispatchers.IO) {
-            val cochesTorneo: List<CocheEntity> = cocheDao.obtenerCochesPorTorneo(torneoId.toInt())
+            // Obtener todos los coches del torneo: los del torneo + los de todas las carreras
+            val todosLosCoches: List<CocheEntity> = cocheDao.obtenerTodosLosCochesDelTorneo(torneoId.toInt())
 
-            val lista = cochesTorneo.map {
-                Car(
-                    id = it.idCoche,
-                    name = "#${it.dorsal} ${it.marca} ${it.modelo}",
-                    team = it.color,
-                    status = CarStatus.valueOf(it.status)
-                )
-            }
+            val lista = todosLosCoches
+                .distinctBy { it.idCoche } // Eliminar duplicados por si acaso
+                .sortedBy { it.dorsal } // Ordenar por dorsal
+                .map {
+                    Car(
+                        id = it.idCoche,
+                        name = "#${it.dorsal} ${it.marca} ${it.modelo}",
+                        team = it.color,
+                        status = CarStatus.valueOf(it.status)
+                    )
+                }
 
             withContext(Dispatchers.Main) {
                 carsList.clear()

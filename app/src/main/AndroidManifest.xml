@@ -21,6 +21,9 @@
             android:name=".ui.cars.AddCarActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.cars.SearchCarActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.torneo.TorneoDetailActivity"
             android:exported="false" />
         <activity

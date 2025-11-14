@@ -28,7 +28,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Color del trofeo"
+        android:text="Elige un color para el torneo"
         android:textColor="@android:color/white"
         android:textSize="14sp"
         android:layout_marginTop="12dp"/>

@@ -4,11 +4,11 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.appcarreras.R
 import com.example.appcarreras.data.database.DatabaseProvider
+import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,8 +27,8 @@ class CarAdapter(
         val carName: TextView = view.findViewById(R.id.tvCarName)
         val teamName: TextView = view.findViewById(R.id.tvTeamName)
         val statusDot: View = view.findViewById(R.id.statusDot)
-        val btnEdit: ImageButton = view.findViewById(R.id.btnEditCar)
-        val btnDelete: ImageButton = view.findViewById(R.id.btnDeleteCar)
+        val btnEdit: MaterialButton = view.findViewById(R.id.btnEditCar)
+        val btnDelete: MaterialButton = view.findViewById(R.id.btnDeleteCar)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CarViewHolder {
@@ -46,7 +46,7 @@ class CarAdapter(
 
         // Mostrar datos
         holder.carName.text = car.name.substringAfter(" ")
-        holder.teamName.text = car.team
+        holder.teamName.text = "Color: ${car.team}"
 
         // Color inicial
         updateStatusColor(holder.statusDot, car.status)

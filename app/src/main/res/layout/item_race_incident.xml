@@ -82,7 +82,7 @@
                 android:id="@+id/tvIncidentPenalty"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Penalty: 1"
+                android:text="Vueltas de Penalización: 1"
                 android:textColor="@color/red"
                 android:textSize="14sp"
                 android:textStyle="bold" />

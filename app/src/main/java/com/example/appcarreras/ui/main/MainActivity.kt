@@ -191,7 +191,8 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun convertirATorneosConConteo(torneos: List<TorneoEntity>): List<Campeonato> {
         return torneos.map {
-            val numCoches = cocheDao.contarCochesPorTorneo(it.idTorneo.toLong())
+            // Contar todos los coches del torneo (incluyendo los de todas las carreras)
+            val numCoches = cocheDao.contarTodosLosCochesDelTorneo(it.idTorneo.toLong())
             Campeonato(
                 nombre = it.nombre,
                 numCoches = numCoches,

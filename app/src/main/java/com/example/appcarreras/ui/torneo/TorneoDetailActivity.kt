@@ -32,7 +32,7 @@ class TorneoDetailActivity : AppCompatActivity() {
         val adapter = ViewPagerAdapter(this, torneoId)
         binding.viewPager.adapter = adapter
 
-        val tabTitles = listOf("Cars", "Races")
+        val tabTitles = listOf("Coches", "Carreras")
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = tabTitles[position]
         }.attach()

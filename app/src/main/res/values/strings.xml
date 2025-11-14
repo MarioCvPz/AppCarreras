@@ -14,7 +14,7 @@
     <string name="action_export_excel">Exportar a Excel</string>
     <string name="empty_race_cars">No hay coches registrados aún</string>
     <string name="empty_race_incidents">Todavía no hay incidencias para esta carrera</string>
-    <string name="label_penalty_laps_value">Penalty: %1$d</string>
+    <string name="label_penalty_laps_value">Vueltas de Penalización: %1$d</string>
     <string name="title_add_incident">Log Race Action</string>
     <string name="label_incident_details">Incident Details</string>
     <string name="hint_car_number">Número de dorsal</string>

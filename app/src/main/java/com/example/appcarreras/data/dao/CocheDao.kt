@@ -12,11 +12,23 @@ interface CocheDao {
     @Query("SELECT * FROM coches WHERE torneoId = :torneoId AND carreraId IS NULL")
     suspend fun obtenerCochesPorTorneo(torneoId: Int): List<CocheEntity>
 
+    @Query("SELECT * FROM coches WHERE torneoId = :torneoId")
+    suspend fun obtenerTodosLosCochesDelTorneo(torneoId: Int): List<CocheEntity>
+
     @Query("SELECT COUNT(*) FROM coches WHERE torneoId = :torneoId AND carreraId IS NULL")
     suspend fun contarCochesPorTorneo(torneoId: Long): Int
 
+    @Query("SELECT COUNT(*) FROM coches WHERE torneoId = :torneoId")
+    suspend fun contarTodosLosCochesDelTorneo(torneoId: Long): Int
+
     @Query("SELECT EXISTS(SELECT 1 FROM coches WHERE torneoId = :torneoId AND carreraId IS NULL AND dorsal = :dorsal)")
     suspend fun existeDorsalEnTorneo(torneoId: Long, dorsal: Int): Boolean
+
+    @Query("SELECT EXISTS(SELECT 1 FROM coches WHERE torneoId = :torneoId AND dorsal = :dorsal)")
+    suspend fun existeDorsalEnTodoElTorneo(torneoId: Long, dorsal: Int): Boolean
+
+    @Query("SELECT EXISTS(SELECT 1 FROM coches WHERE torneoId = :torneoId AND dorsal = :dorsal AND idCoche != :excluirCocheId)")
+    suspend fun existeDorsalEnTodoElTorneoExcluyendo(torneoId: Long, dorsal: Int, excluirCocheId: Int): Boolean
 
     @Query("SELECT * FROM coches WHERE torneoId = :torneoId AND carreraId IS NULL AND dorsal = :dorsal LIMIT 1")
     suspend fun obtenerCochePorDorsal(torneoId: Long, dorsal: Int): CocheEntity?
@@ -41,4 +53,40 @@ interface CocheDao {
 
     @Delete
     suspend fun eliminarCoche(coche: CocheEntity)
+
+    // Buscar coches excluyendo el torneo actual
+    @Query("SELECT * FROM coches WHERE torneoId != :torneoIdExcluir")
+    suspend fun buscarCochesExcluyendoTorneo(torneoIdExcluir: Long): List<CocheEntity>
+
+    // Buscar coches por texto (marca, modelo, color, dorsal) excluyendo el torneo actual
+    @Query("""
+        SELECT * FROM coches 
+        WHERE torneoId != :torneoIdExcluir 
+        AND (
+            marca LIKE '%' || :query || '%' 
+            OR modelo LIKE '%' || :query || '%' 
+            OR color LIKE '%' || :query || '%' 
+            OR CAST(dorsal AS TEXT) LIKE '%' || :query || '%'
+        )
+        ORDER BY marca, modelo, dorsal
+    """)
+    suspend fun buscarCochesPorTexto(torneoIdExcluir: Long, query: String): List<CocheEntity>
+
+    data class CocheBusqueda(
+        val marca: String,
+        val modelo: String,
+        val color: String,
+        val dorsal: Int
+    ) {
+        companion object {
+            fun fromEntity(entity: CocheEntity): CocheBusqueda {
+                return CocheBusqueda(
+                    marca = entity.marca,
+                    modelo = entity.modelo,
+                    color = entity.color,
+                    dorsal = entity.dorsal
+                )
+            }
+        }
+    }
 }

@@ -66,25 +66,21 @@ class RaceCarsFragment : Fragment() {
     }
 
     private fun cargarCoches() {
-        if (torneoId == -1L) return
+        if (torneoId == -1L || carreraId == -1) return
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            val cochesCarrera: List<CocheEntity> = if (carreraId != -1) {
-                cocheDao.obtenerCochesPorCarrera(carreraId)
-            } else {
-                emptyList()
-            }
-            val cochesTorneo: List<CocheEntity> = cocheDao.obtenerCochesPorTorneo(torneoId.toInt())
-            val coches = (cochesCarrera + cochesTorneo)
-                .distinctBy { it.idCoche }
-                .sortedBy { it.dorsal }
-            val mapped = coches.map {
-                Car(
-                    id = it.idCoche,
-                    name = "#${it.dorsal} ${it.marca} ${it.modelo}",
-                    team = it.color,
-                    status = CarStatus.valueOf(it.status)
-                )
-            }
+            // Solo mostrar los coches creados específicamente para esta carrera
+            val cochesCarrera: List<CocheEntity> = cocheDao.obtenerCochesPorCarrera(carreraId)
+            
+            val mapped = cochesCarrera
+                .sortedBy { it.dorsal } // Ordenar por dorsal
+                .map {
+                    Car(
+                        id = it.idCoche,
+                        name = "#${it.dorsal} ${it.marca} ${it.modelo}",
+                        team = it.color,
+                        status = CarStatus.valueOf(it.status)
+                    )
+                }
             withContext(Dispatchers.Main) {
                 carsList.clear()
                 carsList.addAll(mapped)

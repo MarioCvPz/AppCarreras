@@ -1,9 +1,11 @@
 package com.example.appcarreras.ui.cars
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.appcarreras.R
@@ -24,6 +26,26 @@ class AddCarActivity : AppCompatActivity() {
     private var carreraId: Int? = null
     private var cocheId: Int? = null
     private var isEditMode = false
+
+    private val searchCarLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            result.data?.let { data ->
+                val marca = data.getStringExtra(SearchCarActivity.EXTRA_MARCA) ?: ""
+                val modelo = data.getStringExtra(SearchCarActivity.EXTRA_MODELO) ?: ""
+                val color = data.getStringExtra(SearchCarActivity.EXTRA_COLOR) ?: ""
+                val dorsal = data.getIntExtra(SearchCarActivity.EXTRA_DORSAL, -1)
+
+                if (marca.isNotEmpty() && modelo.isNotEmpty() && color.isNotEmpty() && dorsal != -1) {
+                    binding.etMarca.setText(marca)
+                    binding.etModelo.setText(modelo)
+                    binding.etColor.setText(color)
+                    binding.etDorsal.setText(dorsal.toString())
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +81,8 @@ class AddCarActivity : AppCompatActivity() {
         if (isEditMode) {
             supportActionBar?.title = getString(R.string.title_edit_car)
             cargarDatosCoche()
+            // Ocultar botón de búsqueda en modo edición
+            binding.btnSearchExistingCar.visibility = View.GONE
         } else if (carreraId != null) {
             supportActionBar?.title = getString(R.string.title_add_race_car)
         }
@@ -66,6 +90,13 @@ class AddCarActivity : AppCompatActivity() {
         // Acción del botón "Save Car"
         binding.btnSaveCar.setOnClickListener {
             guardarCar()
+        }
+
+        // Acción del botón "Buscar Coche Existente" (solo visible en modo creación)
+        binding.btnSearchExistingCar.setOnClickListener {
+            val intent = Intent(this, SearchCarActivity::class.java)
+            intent.putExtra(SearchCarActivity.EXTRA_TORNEO_ID_EXCLUIR, torneoId)
+            searchCarLauncher.launch(intent)
         }
     }
 
@@ -110,31 +141,28 @@ class AddCarActivity : AppCompatActivity() {
         binding.btnSaveCar.text = "Saving..."
 
         lifecycleScope.launch(Dispatchers.IO) {
-            // Si estamos editando, verificar que el dorsal no esté en uso por otro coche
+            // Verificar que el dorsal no esté en uso por otro coche en TODO el torneo
             val cocheActual = if (isEditMode && cocheId != null) {
                 carDao.obtenerCochePorId(cocheId!!)
             } else {
                 null
             }
             
-            val existeEnTorneo = carDao.existeDorsalEnTorneo(torneoId, dorsal)
-            val carreraActual = carreraId
-            val existeEnCarrera = if (carreraActual != null) {
-                carDao.existeDorsalEnCarrera(carreraActual, dorsal) || existeEnTorneo
+            // Verificar si el dorsal existe en todo el torneo (incluyendo todas las carreras)
+            val existeDorsal = if (isEditMode && cocheId != null) {
+                // Si estamos editando, excluir el coche actual de la verificación
+                carDao.existeDorsalEnTodoElTorneoExcluyendo(torneoId, dorsal, cocheId!!)
             } else {
-                existeEnTorneo
+                // Si estamos creando, verificar en todo el torneo
+                carDao.existeDorsalEnTodoElTorneo(torneoId, dorsal)
             }
             
-            // Si estamos editando y el dorsal es el mismo del coche actual, permitir
-            val esMismoCoche = cocheActual?.dorsal == dorsal
-            
-            if (existeEnCarrera && !esMismoCoche) {
-
+            if (existeDorsal) {
                 withContext(Dispatchers.Main) {
                     binding.layoutDorsal.error = ""
                     binding.tvErrorDorsal.visibility = View.VISIBLE
                     binding.tvErrorDorsal.text =
-                        "Dorsal $dorsal is already registered. Please use a different number."
+                        "Dorsal $dorsal is already registered in this tournament. Please use a different number."
                     binding.btnSaveCar.isEnabled = true
                     binding.btnSaveCar.text = "Save Car"
                 }

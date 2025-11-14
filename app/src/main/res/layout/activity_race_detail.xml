@@ -22,7 +22,7 @@
         app:navigationIcon="@drawable/ic_arrow_back"
         app:navigationIconTint="@android:color/white"
         app:titleTextAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-        tools:title="Race Detail" />
+        tools:title="Detalles de la Carrera" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayoutRace"
