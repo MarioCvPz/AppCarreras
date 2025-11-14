@@ -50,6 +50,7 @@ class RaceDetailActivity : AppCompatActivity() {
         uri?.let { handleDirectorySelected(it) }
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -131,21 +132,15 @@ class RaceDetailActivity : AppCompatActivity() {
 
     private fun mostrarDialogoExportar() {
         val currentFolder = getExportDirectoryLabel()
-        val message = currentFolder?.let {
-            getString(R.string.dialog_export_message_with_folder, it)
-        } ?: getString(R.string.dialog_export_message_no_folder)
-
-        AlertDialog.Builder(this)
-            .setTitle(R.string.dialog_export_title)
-            .setMessage(message)
-            .setPositiveButton(R.string.dialog_export_positive) { _, _ ->
-                exportarIncidenciasAExcel()
-            }
-            .setNeutralButton(R.string.dialog_export_choose_folder) { _, _ ->
-                abrirSelectorDirectorio()
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
+        val exportDirUri = getSelectedExportDirectoryUri()
+        
+        if (exportDirUri != null && currentFolder != null) {
+            // Si ya hay una carpeta seleccionada, exportar directamente
+            exportarIncidenciasAExcel()
+        } else {
+            // Si no hay carpeta, abrir selector de directorio
+            abrirSelectorDirectorio()
+        }
     }
 
     private fun exportarIncidenciasAExcel() {
@@ -234,11 +229,9 @@ class RaceDetailActivity : AppCompatActivity() {
                 releasePersistedPermission(previousUri)
             }
             sharedPrefs.edit().putString(KEY_EXPORT_TREE_URI, uri.toString()).apply()
-            Toast.makeText(
-                this,
-                getString(R.string.message_export_directory_saved, getExportDirectoryLabel(uri)),
-                Toast.LENGTH_SHORT
-            ).show()
+            
+            // Exportar automáticamente después de seleccionar la carpeta
+            exportarIncidenciasAExcel()
         } catch (securityException: SecurityException) {
             Toast.makeText(this, R.string.message_export_directory_error, Toast.LENGTH_SHORT).show()
         }

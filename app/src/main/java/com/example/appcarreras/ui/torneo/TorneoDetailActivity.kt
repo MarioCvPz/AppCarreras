@@ -3,6 +3,7 @@ package com.example.appcarreras.ui.torneo
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import com.example.appcarreras.R
 import com.example.appcarreras.databinding.ActivityTorneoDetailBinding
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -17,7 +18,8 @@ class TorneoDetailActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Recuperar nombre del torneo desde el intent
-        val nombreTorneo = intent.getStringExtra("nombreCampeonato") ?: "Tournament"
+        val nombreTorneo = intent.getStringExtra("nombreCampeonato") 
+            ?: getString(R.string.default_tournament_name)
         val torneoId = intent.getLongExtra("TORNEO_ID", -1L)
 
         // Configurar Toolbar
@@ -32,7 +34,10 @@ class TorneoDetailActivity : AppCompatActivity() {
         val adapter = ViewPagerAdapter(this, torneoId)
         binding.viewPager.adapter = adapter
 
-        val tabTitles = listOf("Coches", "Carreras")
+        val tabTitles = listOf(
+            getString(R.string.tab_title_cars),
+            getString(R.string.tab_title_races)
+        )
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = tabTitles[position]
         }.attach()

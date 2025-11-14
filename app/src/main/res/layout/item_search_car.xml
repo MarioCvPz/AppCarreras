@@ -6,6 +6,7 @@
     android:layout_margin="12dp"
     app:cardCornerRadius="18dp"
     app:cardElevation="2dp"
+    app:strokeWidth="0dp"
     android:id="@+id/cardSearchCar">
 
     <LinearLayout

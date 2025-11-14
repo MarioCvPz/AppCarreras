@@ -66,15 +66,41 @@ class MainActivity : AppCompatActivity() {
     /** Carga todos los torneos guardados en la base de datos y los muestra en el RecyclerView */
     private fun cargarTorneosDesdeBD() {
         lifecycleScope.launch(Dispatchers.IO) {
-            val torneos = torneoDao.obtenerTorneos()
+            try {
+                val torneos = torneoDao.obtenerTorneos()
 
-            // Convertimos TorneoEntity -> Campeonato (para el adaptador actual)
-            val listaCampeonatos = convertirATorneosConConteo(torneos)
+                // Convertimos TorneoEntity -> Campeonato (para el adaptador actual)
+                val listaCampeonatos = convertirATorneosConConteo(torneos)
 
-            withContext(Dispatchers.Main) {
-                adapter.actualizarLista(listaCampeonatos)
+                withContext(Dispatchers.Main) {
+                    adapter.actualizarLista(listaCampeonatos)
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    mostrarError(getString(R.string.error_database))
+                }
             }
         }
+    }
+
+    private fun mostrarError(mensaje: String) {
+        com.google.android.material.snackbar.Snackbar.make(
+            binding.root,
+            mensaje,
+            com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+        ).setBackgroundTint(
+            androidx.core.content.ContextCompat.getColor(this, R.color.red)
+        ).show()
+    }
+
+    private fun mostrarExito(mensaje: String) {
+        com.google.android.material.snackbar.Snackbar.make(
+            binding.root,
+            mensaje,
+            com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
+        ).setBackgroundTint(
+            androidx.core.content.ContextCompat.getColor(this, R.color.trophy_green)
+        ).show()
     }
 
     /** Muestra el diálogo para crear un nuevo torneo y guardarlo en la BD */
@@ -118,8 +144,8 @@ class MainActivity : AppCompatActivity() {
 
         val dialog = AlertDialog.Builder(this, R.style.CustomDialogTheme)
             .setView(dialogView)
-            .setPositiveButton("Agregar", null)
-            .setNegativeButton("Cancelar", null)
+            .setPositiveButton(getString(R.string.button_add), null)
+            .setNegativeButton(getString(R.string.dialog_cancel), null)
             .create()
 
         dialog.setOnShowListener {
@@ -128,15 +154,24 @@ class MainActivity : AppCompatActivity() {
             btnOk.setOnClickListener {
                 val nombre = etNombre.text.toString().trim()
                 if (nombre.isEmpty()) {
-                    etNombre.error = "El nombre no puede estar vacío"
+                    etNombre.error = getString(R.string.error_name_empty)
                     return@setOnClickListener
                 }
 
                 lifecycleScope.launch(Dispatchers.IO) {
-                    torneoDao.insertarTorneo(TorneoEntity(nombre = nombre, colorIcono = selectedColor))
-                    val torneos = torneoDao.obtenerTorneos()
-                    val listaCampeonatos = convertirATorneosConConteo(torneos)
-                    withContext(Dispatchers.Main) { adapter.actualizarLista(listaCampeonatos) }
+                    try {
+                        torneoDao.insertarTorneo(TorneoEntity(nombre = nombre, colorIcono = selectedColor))
+                        val torneos = torneoDao.obtenerTorneos()
+                        val listaCampeonatos = convertirATorneosConConteo(torneos)
+                        withContext(Dispatchers.Main) { 
+                            adapter.actualizarLista(listaCampeonatos)
+                            mostrarExito(getString(R.string.success_operation_completed))
+                        }
+                    } catch (e: Exception) {
+                        withContext(Dispatchers.Main) {
+                            mostrarError(getString(R.string.error_database))
+                        }
+                    }
                 }
                 dialog.dismiss()
             }
@@ -155,7 +190,7 @@ class MainActivity : AppCompatActivity() {
         val searchItem = menu?.findItem(R.id.action_search)
         val searchView = searchItem?.actionView as? SearchView
 
-        searchView?.queryHint = "Buscar torneo..."
+        searchView?.queryHint = getString(R.string.hint_search_torneo)
 
         searchView?.setOnQueryTextListener(object :
             SearchView.OnQueryTextListener {
@@ -255,8 +290,8 @@ class MainActivity : AppCompatActivity() {
                 val dialog = AlertDialog.Builder(this@MainActivity, R.style.CustomDialogTheme)
                     .setTitle(R.string.title_edit_torneo)
                     .setView(dialogView)
-                    .setPositiveButton("Guardar", null)
-                    .setNegativeButton("Cancelar", null)
+                    .setPositiveButton(getString(R.string.button_save), null)
+                    .setNegativeButton(getString(R.string.dialog_cancel), null)
                     .create()
 
                 dialog.setOnShowListener {
@@ -265,15 +300,24 @@ class MainActivity : AppCompatActivity() {
                     btnOk.setOnClickListener {
                         val nombre = etNombre.text.toString().trim()
                         if (nombre.isEmpty()) {
-                            etNombre.error = "El nombre no puede estar vacío"
+                            etNombre.error = getString(R.string.error_name_empty)
                             return@setOnClickListener
                         }
 
                         lifecycleScope.launch(Dispatchers.IO) {
-                            torneoDao.actualizarTorneo(torneo.copy(nombre = nombre, colorIcono = selectedColor))
-                            val torneos = torneoDao.obtenerTorneos()
-                            val listaCampeonatos = convertirATorneosConConteo(torneos)
-                            withContext(Dispatchers.Main) { adapter.actualizarLista(listaCampeonatos) }
+                            try {
+                                torneoDao.actualizarTorneo(torneo.copy(nombre = nombre, colorIcono = selectedColor))
+                                val torneos = torneoDao.obtenerTorneos()
+                                val listaCampeonatos = convertirATorneosConConteo(torneos)
+                                withContext(Dispatchers.Main) { 
+                                    adapter.actualizarLista(listaCampeonatos)
+                                    mostrarExito(getString(R.string.success_operation_completed))
+                                }
+                            } catch (e: Exception) {
+                                withContext(Dispatchers.Main) {
+                                    mostrarError(getString(R.string.error_database))
+                                }
+                            }
                         }
                         dialog.dismiss()
                     }
@@ -294,12 +338,21 @@ class MainActivity : AppCompatActivity() {
             .setMessage(getString(R.string.dialog_delete_torneo_message, campeonato.nombre))
             .setPositiveButton(R.string.dialog_confirm) { _, _ ->
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val torneo = torneoDao.obtenerTorneoPorId(campeonato.idTorneo)
-                    torneo?.let {
-                        torneoDao.eliminarTorneo(it)
-                        val torneos = torneoDao.obtenerTorneos()
-                        val listaCampeonatos = convertirATorneosConConteo(torneos)
-                        withContext(Dispatchers.Main) { adapter.actualizarLista(listaCampeonatos) }
+                    try {
+                        val torneo = torneoDao.obtenerTorneoPorId(campeonato.idTorneo)
+                        torneo?.let {
+                            torneoDao.eliminarTorneo(it)
+                            val torneos = torneoDao.obtenerTorneos()
+                            val listaCampeonatos = convertirATorneosConConteo(torneos)
+                            withContext(Dispatchers.Main) { 
+                                adapter.actualizarLista(listaCampeonatos)
+                                mostrarExito(getString(R.string.success_operation_completed))
+                            }
+                        }
+                    } catch (e: Exception) {
+                        withContext(Dispatchers.Main) {
+                            mostrarError(getString(R.string.error_database))
+                        }
                     }
                 }
             }

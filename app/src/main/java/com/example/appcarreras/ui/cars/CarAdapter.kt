@@ -46,7 +46,7 @@ class CarAdapter(
 
         // Mostrar datos
         holder.carName.text = car.name.substringAfter(" ")
-        holder.teamName.text = "Color: ${car.team}"
+        holder.teamName.text = context.getString(R.string.label_color_prefix, car.team)
 
         // Color inicial
         updateStatusColor(holder.statusDot, car.status)

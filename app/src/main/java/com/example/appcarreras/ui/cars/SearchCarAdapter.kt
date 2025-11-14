@@ -41,28 +41,44 @@ class SearchCarAdapter(
 
         holder.tvDorsal.text = coche.dorsal.toString()
         holder.tvCarName.text = "${coche.marca} ${coche.modelo}"
-        holder.tvTeamName.text = "Color: ${coche.color}"
+        holder.tvTeamName.text = holder.itemView.context.getString(
+            com.example.appcarreras.R.string.label_color_prefix, 
+            coche.color
+        )
 
-        // Cambiar color de fondo si está seleccionado
+        // Cambiar apariencia visual si está seleccionado
         if (isSelected) {
+            // Seleccionado: borde naranja grueso, elevación alta, fondo ligeramente más claro
+            holder.cardView.strokeWidth = 4 // Borde grueso
+            holder.cardView.strokeColor = ContextCompat.getColor(holder.itemView.context, R.color.primary_orange)
             holder.cardView.setCardBackgroundColor(
-                ContextCompat.getColor(holder.itemView.context, R.color.primary_orange)
+                ContextCompat.getColor(holder.itemView.context, R.color.card_background)
             )
+            holder.cardView.cardElevation = 8f // Mayor elevación
             holder.tvCarName.setTextColor(
-                ContextCompat.getColor(holder.itemView.context, R.color.white)
+                ContextCompat.getColor(holder.itemView.context, R.color.primary_orange)
             )
             holder.tvTeamName.setTextColor(
                 ContextCompat.getColor(holder.itemView.context, R.color.white)
             )
+            holder.tvDorsal.setTextColor(
+                ContextCompat.getColor(holder.itemView.context, R.color.primary_orange)
+            )
         } else {
+            // No seleccionado: sin borde, elevación normal
+            holder.cardView.strokeWidth = 0 // Sin borde
             holder.cardView.setCardBackgroundColor(
                 ContextCompat.getColor(holder.itemView.context, R.color.card_background)
             )
+            holder.cardView.cardElevation = 2f // Elevación normal
             holder.tvCarName.setTextColor(
                 ContextCompat.getColor(holder.itemView.context, R.color.white)
             )
             holder.tvTeamName.setTextColor(
                 ContextCompat.getColor(holder.itemView.context, android.R.color.darker_gray)
+            )
+            holder.tvDorsal.setTextColor(
+                ContextCompat.getColor(holder.itemView.context, android.R.color.holo_orange_dark)
             )
         }
 

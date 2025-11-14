@@ -64,21 +64,47 @@ class RacesFragment : Fragment() {
         if (torneoId == -1L) return
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            val carreras = carreraDao.obtenerCarrerasPorTorneo(torneoId.toInt())
-            val races = carreras.map { carrera ->
-                Race(
-                    id = carrera.idCarrera,
-                    name = carrera.nombreCarrera,
-                    date = carrera.fechaCarrera,
-                )
-            }
+            try {
+                val carreras = carreraDao.obtenerCarrerasPorTorneo(torneoId.toInt())
+                val races = carreras.map { carrera ->
+                    Race(
+                        id = carrera.idCarrera,
+                        name = carrera.nombreCarrera,
+                        date = carrera.fechaCarrera,
+                    )
+                }
 
-            withContext(Dispatchers.Main) {
-                racesList.clear()
-                racesList.addAll(races)
-                adapter.notifyDataSetChanged()
+                withContext(Dispatchers.Main) {
+                    racesList.clear()
+                    racesList.addAll(races)
+                    adapter.notifyDataSetChanged()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    mostrarError(getString(R.string.error_database))
+                }
             }
         }
+    }
+
+    private fun mostrarExito(mensaje: String) {
+        com.google.android.material.snackbar.Snackbar.make(
+            binding.root,
+            mensaje,
+            com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
+        ).setBackgroundTint(
+            androidx.core.content.ContextCompat.getColor(requireContext(), R.color.trophy_green)
+        ).show()
+    }
+
+    private fun mostrarError(mensaje: String) {
+        com.google.android.material.snackbar.Snackbar.make(
+            binding.root,
+            mensaje,
+            com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+        ).setBackgroundTint(
+            androidx.core.content.ContextCompat.getColor(requireContext(), R.color.red)
+        ).show()
     }
 
     private fun mostrarDialogoNuevaCarrera() {
@@ -108,8 +134,8 @@ class RacesFragment : Fragment() {
 
         val dialog = AlertDialog.Builder(requireContext(), R.style.CustomDialogTheme)
             .setView(dialogView)
-            .setPositiveButton("Agregar", null)
-            .setNegativeButton("Cancelar", null)
+            .setPositiveButton(getString(R.string.button_add_race), null)
+            .setNegativeButton(getString(R.string.dialog_cancel), null)
             .create()
 
         dialog.setOnShowListener {
@@ -132,17 +158,24 @@ class RacesFragment : Fragment() {
                 if (!esValido) return@setOnClickListener
 
                 viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                    carreraDao.insertarCarrera(
-                        CarreraEntity(
-                            torneoId = torneoId.toInt(),
-                            nombreCarrera = nombre,
-                            fechaCarrera = fecha,
-                        ),
-                    )
+                    try {
+                        carreraDao.insertarCarrera(
+                            CarreraEntity(
+                                torneoId = torneoId.toInt(),
+                                nombreCarrera = nombre,
+                                fechaCarrera = fecha,
+                            ),
+                        )
 
-                    withContext(Dispatchers.Main) {
-                        dialog.dismiss()
-                        cargarCarreras()
+                        withContext(Dispatchers.Main) {
+                            dialog.dismiss()
+                            cargarCarreras()
+                            mostrarExito(getString(R.string.success_operation_completed))
+                        }
+                    } catch (e: Exception) {
+                        withContext(Dispatchers.Main) {
+                            mostrarError(getString(R.string.error_database))
+                        }
                     }
                 }
             }
@@ -181,11 +214,20 @@ class RacesFragment : Fragment() {
             .setTitle(R.string.dialog_delete_race_title)
             .setMessage(getString(R.string.dialog_delete_race_message, race.name))
             .setPositiveButton(R.string.dialog_confirm) { _, _ ->
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val carrera = carreraDao.obtenerCarreraPorId(race.id)
-                    carrera?.let {
-                        carreraDao.eliminarCarrera(it)
-                        cargarCarreras()
+                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                    try {
+                        val carrera = carreraDao.obtenerCarreraPorId(race.id)
+                        carrera?.let {
+                            carreraDao.eliminarCarrera(it)
+                            withContext(Dispatchers.Main) {
+                                cargarCarreras()
+                                mostrarExito(getString(R.string.success_operation_completed))
+                            }
+                        }
+                    } catch (e: Exception) {
+                        withContext(Dispatchers.Main) {
+                            mostrarError(getString(R.string.error_database))
+                        }
                     }
                 }
             }
@@ -222,8 +264,8 @@ class RacesFragment : Fragment() {
         val dialog = AlertDialog.Builder(requireContext(), R.style.CustomDialogTheme)
             .setTitle(R.string.title_edit_race)
             .setView(dialogView)
-            .setPositiveButton("Guardar", null)
-            .setNegativeButton("Cancelar", null)
+            .setPositiveButton(getString(R.string.button_save), null)
+            .setNegativeButton(getString(R.string.dialog_cancel), null)
             .create()
 
         dialog.setOnShowListener {

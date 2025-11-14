@@ -54,14 +54,18 @@ interface CocheDao {
     @Delete
     suspend fun eliminarCoche(coche: CocheEntity)
 
-    // Buscar coches excluyendo el torneo actual
+    // Obtener todos los coches de todos los torneos
+    @Query("SELECT * FROM coches")
+    suspend fun obtenerTodosLosCoches(): List<CocheEntity>
+
+    // Buscar coches excluyendo el torneo actual (si torneoIdExcluir es -1, devuelve todos)
     @Query("SELECT * FROM coches WHERE torneoId != :torneoIdExcluir")
     suspend fun buscarCochesExcluyendoTorneo(torneoIdExcluir: Long): List<CocheEntity>
 
     // Buscar coches por texto (marca, modelo, color, dorsal) excluyendo el torneo actual
     @Query("""
         SELECT * FROM coches 
-        WHERE torneoId != :torneoIdExcluir 
+        WHERE torneoId != :torneoIdExcluir
         AND (
             marca LIKE '%' || :query || '%' 
             OR modelo LIKE '%' || :query || '%' 

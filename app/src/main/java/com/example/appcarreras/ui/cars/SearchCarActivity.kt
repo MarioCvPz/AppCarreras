@@ -47,7 +47,7 @@ class SearchCarActivity : AppCompatActivity() {
     private fun setupToolbar() {
         setSupportActionBar(binding.toolbarSearchCar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "Buscar Coche Existente"
+        supportActionBar?.title = getString(R.string.title_search_existing_car)
         binding.toolbarSearchCar.setNavigationOnClickListener { 
             finish()
         }
@@ -95,78 +95,103 @@ class SearchCarActivity : AppCompatActivity() {
                 setResult(RESULT_OK, resultIntent)
                 finish()
             } ?: run {
-                Toast.makeText(this, "Selecciona un coche primero", Toast.LENGTH_SHORT).show()
+                mostrarError(getString(R.string.error_select_car_first))
             }
         }
     }
 
     private fun cargarTodosLosCoches() {
-        if (torneoIdExcluir == -1L) {
-            Toast.makeText(this, "Error: torneo no válido", Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
-
         lifecycleScope.launch(Dispatchers.IO) {
-            val cochesEntities = cocheDao.buscarCochesExcluyendoTorneo(torneoIdExcluir)
-            // Convertir a CocheBusqueda y eliminar duplicados
-            val coches = cochesEntities
-                .map { CocheDao.CocheBusqueda.fromEntity(it) }
-                .distinctBy { "${it.marca}_${it.modelo}_${it.color}_${it.dorsal}" }
-                .sortedWith(compareBy({ it.marca }, { it.modelo }, { it.dorsal }))
-            
-            withContext(Dispatchers.Main) {
-                cochesList.clear()
-                cochesList.addAll(coches)
-                adapter.notifyDataSetChanged()
-                mostrarEstadoVacio(coches.isEmpty())
+            try {
+                // Mostrar TODOS los coches de TODOS los torneos, sin excluir ninguno
+                val cochesEntities = cocheDao.obtenerTodosLosCoches()
+                // Convertir a CocheBusqueda y eliminar duplicados
+                val coches = cochesEntities
+                    .map { CocheDao.CocheBusqueda.fromEntity(it) }
+                    .distinctBy { "${it.marca}_${it.modelo}_${it.color}_${it.dorsal}" }
+                    .sortedWith(compareBy({ it.marca }, { it.modelo }, { it.dorsal }))
+                
+                withContext(Dispatchers.Main) {
+                    cochesList.clear()
+                    cochesList.addAll(coches)
+                    adapter.notifyDataSetChanged()
+                    mostrarEstadoVacio(coches.isEmpty())
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    mostrarError(getString(R.string.error_database))
+                    e.printStackTrace() // Para debugging
+                }
             }
         }
     }
 
     private fun buscarCoches(query: String) {
-        if (torneoIdExcluir == -1L) return
-
         lifecycleScope.launch(Dispatchers.IO) {
-            val cochesEntities = if (query.isEmpty()) {
-                cocheDao.buscarCochesExcluyendoTorneo(torneoIdExcluir)
-            } else {
-                cocheDao.buscarCochesPorTexto(torneoIdExcluir, query)
-            }
-            
-            // Convertir a CocheBusqueda y eliminar duplicados
-            val coches = cochesEntities
-                .map { CocheDao.CocheBusqueda.fromEntity(it) }
-                .distinctBy { "${it.marca}_${it.modelo}_${it.color}_${it.dorsal}" }
-                .sortedWith(compareBy({ it.marca }, { it.modelo }, { it.dorsal }))
-            
-            withContext(Dispatchers.Main) {
-                cochesList.clear()
-                cochesList.addAll(coches)
-                adapter.notifyDataSetChanged()
-                mostrarEstadoVacio(coches.isEmpty())
+            try {
+                // Buscar en TODOS los coches de TODOS los torneos
+                val cochesEntities = if (query.isEmpty()) {
+                    // Si no hay query, mostrar todos los coches
+                    cocheDao.obtenerTodosLosCoches()
+                } else {
+                    // Si hay query, buscar por texto en todos los coches
+                    cocheDao.obtenerTodosLosCoches().filter {
+                        it.marca.contains(query, ignoreCase = true) ||
+                        it.modelo.contains(query, ignoreCase = true) ||
+                        it.color.contains(query, ignoreCase = true) ||
+                        it.dorsal.toString().contains(query, ignoreCase = true)
+                    }
+                }
                 
-                // Si había un coche seleccionado, verificar si sigue en la lista
-                cocheSeleccionado?.let { seleccionado ->
-                    val sigueEnLista = coches.any { 
-                        it.marca == seleccionado.marca && 
-                        it.modelo == seleccionado.modelo && 
-                        it.color == seleccionado.color && 
-                        it.dorsal == seleccionado.dorsal 
+                // Convertir a CocheBusqueda y eliminar duplicados
+                val coches = cochesEntities
+                    .map { CocheDao.CocheBusqueda.fromEntity(it) }
+                    .distinctBy { "${it.marca}_${it.modelo}_${it.color}_${it.dorsal}" }
+                    .sortedWith(compareBy({ it.marca }, { it.modelo }, { it.dorsal }))
+                
+                withContext(Dispatchers.Main) {
+                    cochesList.clear()
+                    cochesList.addAll(coches)
+                    adapter.notifyDataSetChanged()
+                    mostrarEstadoVacio(coches.isEmpty())
+                    
+                    // Si había un coche seleccionado, verificar si sigue en la lista
+                    cocheSeleccionado?.let { seleccionado ->
+                        val sigueEnLista = coches.any { 
+                            it.marca == seleccionado.marca && 
+                            it.modelo == seleccionado.modelo && 
+                            it.color == seleccionado.color && 
+                            it.dorsal == seleccionado.dorsal 
+                        }
+                        if (!sigueEnLista) {
+                            cocheSeleccionado = null
+                            adapter.setSelectedCoche(null)
+                            binding.btnAddCar.isEnabled = false
+                        }
                     }
-                    if (!sigueEnLista) {
-                        cocheSeleccionado = null
-                        adapter.setSelectedCoche(null)
-                        binding.btnAddCar.isEnabled = false
-                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    mostrarError(getString(R.string.error_database))
                 }
             }
         }
     }
 
     private fun mostrarEstadoVacio(isEmpty: Boolean) {
+        binding.emptyState.text = getString(R.string.empty_no_cars_found)
         binding.emptyState.visibility = if (isEmpty) View.VISIBLE else View.GONE
         binding.recyclerSearchCars.visibility = if (isEmpty) View.GONE else View.VISIBLE
+    }
+
+    private fun mostrarError(mensaje: String) {
+        com.google.android.material.snackbar.Snackbar.make(
+            binding.root,
+            mensaje,
+            com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+        ).setBackgroundTint(
+            androidx.core.content.ContextCompat.getColor(this, R.color.red)
+        ).show()
     }
 
     companion object {

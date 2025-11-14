@@ -74,28 +74,44 @@ class CarsFragment : Fragment() {
 
     private fun cargarCoches() {
         if (torneoId == -1L) return
-        lifecycleScope.launch(Dispatchers.IO) {
-            // Obtener todos los coches del torneo: los del torneo + los de todas las carreras
-            val todosLosCoches: List<CocheEntity> = cocheDao.obtenerTodosLosCochesDelTorneo(torneoId.toInt())
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                // Obtener todos los coches del torneo: los del torneo + los de todas las carreras
+                val todosLosCoches: List<CocheEntity> = cocheDao.obtenerTodosLosCochesDelTorneo(torneoId.toInt())
 
-            val lista = todosLosCoches
-                .distinctBy { it.idCoche } // Eliminar duplicados por si acaso
-                .sortedBy { it.dorsal } // Ordenar por dorsal
-                .map {
-                    Car(
-                        id = it.idCoche,
-                        name = "#${it.dorsal} ${it.marca} ${it.modelo}",
-                        team = it.color,
-                        status = CarStatus.valueOf(it.status)
-                    )
+                val lista = todosLosCoches
+                    .distinctBy { it.idCoche } // Eliminar duplicados por si acaso
+                    .sortedBy { it.dorsal } // Ordenar por dorsal
+                    .map {
+                        Car(
+                            id = it.idCoche,
+                            name = "#${it.dorsal} ${it.marca} ${it.modelo}",
+                            team = it.color,
+                            status = CarStatus.valueOf(it.status)
+                        )
+                    }
+
+                withContext(Dispatchers.Main) {
+                    carsList.clear()
+                    carsList.addAll(lista)
+                    adapter.filter("") // Mostrar todos
                 }
-
-            withContext(Dispatchers.Main) {
-                carsList.clear()
-                carsList.addAll(lista)
-                adapter.filter("") // Mostrar todos
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    mostrarError(getString(R.string.error_database))
+                }
             }
         }
+    }
+
+    private fun mostrarError(mensaje: String) {
+        com.google.android.material.snackbar.Snackbar.make(
+            binding.root,
+            mensaje,
+            com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+        ).setBackgroundTint(
+            androidx.core.content.ContextCompat.getColor(requireContext(), R.color.red)
+        ).show()
     }
 
     override fun onResume() {
@@ -122,25 +138,50 @@ class CarsFragment : Fragment() {
     }
 
     private fun eliminarCoche(car: Car) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val coche = cocheDao.obtenerCochePorId(car.id)
-            withContext(Dispatchers.Main) {
-                coche?.let {
-                    val nombreCompleto = "${it.marca} ${it.modelo}"
-                    androidx.appcompat.app.AlertDialog.Builder(requireContext(), R.style.CustomDialogTheme)
-                        .setTitle(R.string.dialog_delete_car_title)
-                        .setMessage(getString(R.string.dialog_delete_car_message, it.dorsal, nombreCompleto))
-                        .setPositiveButton(R.string.dialog_confirm) { _, _ ->
-                            lifecycleScope.launch(Dispatchers.IO) {
-                                cocheDao.eliminarCoche(it)
-                                cargarCoches()
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val coche = cocheDao.obtenerCochePorId(car.id)
+                withContext(Dispatchers.Main) {
+                    coche?.let {
+                        val nombreCompleto = "${it.marca} ${it.modelo}"
+                        androidx.appcompat.app.AlertDialog.Builder(requireContext(), R.style.CustomDialogTheme)
+                            .setTitle(R.string.dialog_delete_car_title)
+                            .setMessage(getString(R.string.dialog_delete_car_message, it.dorsal, nombreCompleto))
+                            .setPositiveButton(R.string.dialog_confirm) { _, _ ->
+                                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                                    try {
+                                        cocheDao.eliminarCoche(it)
+                                        withContext(Dispatchers.Main) {
+                                            cargarCoches()
+                                            mostrarExito(getString(R.string.success_operation_completed))
+                                        }
+                                    } catch (e: Exception) {
+                                        withContext(Dispatchers.Main) {
+                                            mostrarError(getString(R.string.error_database))
+                                        }
+                                    }
+                                }
                             }
-                        }
-                        .setNegativeButton(R.string.dialog_cancel, null)
-                        .show()
+                            .setNegativeButton(R.string.dialog_cancel, null)
+                            .show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    mostrarError(getString(R.string.error_database))
                 }
             }
         }
+    }
+
+    private fun mostrarExito(mensaje: String) {
+        com.google.android.material.snackbar.Snackbar.make(
+            binding.root,
+            mensaje,
+            com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
+        ).setBackgroundTint(
+            androidx.core.content.ContextCompat.getColor(requireContext(), R.color.trophy_green)
+        ).show()
     }
 
     override fun onDestroyView() {

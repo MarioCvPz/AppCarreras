@@ -33,16 +33,35 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
         android:backgroundTint="#2196F3"
-        android:text="Buscar Coche Existente"
+        android:text="@string/button_search_existing_car"
         android:textColor="@android:color/white"
         app:icon="@drawable/ic_search"
         app:iconTint="@android:color/white"
         app:iconGravity="textStart"
         app:layout_constraintTop_toBottomOf="@+id/scrollView"
+        app:layout_constraintBottom_toTopOf="@id/btnAddTournamentCars"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- Botón Agregar Coches del Torneo -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAddTournamentCars"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="#6B1F1F"
+        android:text="@string/button_add_tournament_cars"
+        android:textColor="@android:color/white"
+        app:icon="@drawable/ic_car"
+        app:iconTint="@android:color/white"
+        app:iconGravity="textStart"
+        app:layout_constraintTop_toBottomOf="@id/btnSearchExistingCar"
         app:layout_constraintBottom_toTopOf="@id/btnSaveCar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginBottom="20dp"/>
+        android:layout_marginBottom="8dp"/>
 
     <!-- Scroll container for fields -->
     <ScrollView
@@ -66,7 +85,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Marca"
+                android:text="@string/label_marca"
                 android:textColor="@android:color/white"
                 android:textSize="14sp"
                 android:layout_marginTop="12dp" />
@@ -88,7 +107,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/white"
                     android:textColorHint="@color/white"
-                    android:hint="Marca coche"
+                    android:hint="@string/hint_marca"
                     android:inputType="textCapWords" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -96,7 +115,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Modelo"
+                android:text="@string/label_modelo"
                 android:textColor="@android:color/white"
                 android:textSize="14sp"
                 android:layout_marginTop="20dp" />
@@ -117,7 +136,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/white"
-                    android:hint="Modelo coche"
+                    android:hint="@string/hint_modelo"
                     android:textColorHint="#8E8E8E"
                     android:inputType="textCapWords" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -126,7 +145,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Color"
+                android:text="@string/label_color"
                 android:textColor="@android:color/white"
                 android:textSize="14sp"
                 android:layout_marginTop="20dp" />
@@ -137,7 +156,7 @@
                 android:layout_height="wrap_content"
                 app:boxBackgroundColor="#2B1A11"
                 app:boxCornerRadiusTopStart="12dp"
-                android:hint="Color coche"
+                android:hint="@string/hint_color"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusBottomEnd="12dp"
@@ -156,7 +175,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Dorsal"
+                android:text="@string/label_dorsal"
                 android:textColor="@android:color/white"
                 android:textSize="14sp"
                 android:layout_marginTop="20dp" />
@@ -180,7 +199,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/white"
-                    android:hint="Dorsal coche"
+                    android:hint="@string/hint_dorsal"
                     android:textColorHint="#8E8E8E"
                     android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -209,7 +228,7 @@
         android:layout_height="56dp"
         android:layout_margin="16dp"
         android:backgroundTint="#C46625"
-        android:text="Guardar Coche"
+        android:text="@string/button_save_car"
         android:textColor="@android:color/white"
         app:iconGravity="textStart"
         app:iconTint="@android:color/white"

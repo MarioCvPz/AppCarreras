@@ -22,6 +22,15 @@
         app:navigationIconTint="@android:color/white"
         app:titleTextAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Agrega Incidencia"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -85,7 +94,7 @@
                     android:layout_weight="1"
                     android:minHeight="56dp"
                     android:text="Salida.P"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:textColor="@color/toggle_button_text"
                     app:backgroundTint="@color/toggle_button_background"
                     app:strokeColor="@color/primary_orange"
@@ -199,7 +208,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="24dp"
         android:backgroundTint="#FF7A1A"
-        android:text="@string/action_save_incident"
+        android:text="Guardar Incidencia"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         android:textStyle="bold" />

@@ -37,7 +37,7 @@ class CampeonatoAdapter(
     override fun onBindViewHolder(holder: CampeonatoViewHolder, position: Int) {
         val campeonato = listaFiltrada[position]
         holder.nombreTextView.text = campeonato.nombre
-        holder.detallesTextView.text = "Coches: ${campeonato.numCoches}"
+        holder.detallesTextView.text = context.getString(R.string.label_cars_count, campeonato.numCoches)
         holder.iconTrophy.setColorFilter(campeonato.colorIcono, android.graphics.PorterDuff.Mode.SRC_IN)
 
         holder.itemView.setOnClickListener {

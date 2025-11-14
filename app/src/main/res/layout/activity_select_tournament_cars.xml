@@ -5,16 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#1E120C"
-    tools:context=".ui.cars.SearchCarActivity">
+    tools:context=".ui.cars.SelectTournamentCarsActivity">
 
     <!-- Toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbarSearchCar"
+        android:id="@+id/toolbarSelectCars"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
+        android:layout_marginTop="16dp"
         android:backgroundTint="@android:color/transparent"
-        app:title="@string/title_search_existing_car"
+        app:title="@string/title_select_tournament_cars"
         app:titleTextColor="@android:color/white"
         app:navigationIcon="@drawable/ic_arrow_back"
         app:navigationIconTint="@android:color/white"
@@ -34,7 +34,7 @@
         android:paddingHorizontal="12dp"
         android:layout_margin="16dp"
         android:clipToOutline="true"
-        app:layout_constraintTop_toBottomOf="@id/toolbarSearchCar"
+        app:layout_constraintTop_toBottomOf="@id/toolbarSelectCars"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -58,40 +58,40 @@
 
     <!-- Lista de coches -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerSearchCars"
+        android:id="@+id/recyclerSelectCars"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:paddingHorizontal="16dp"
         android:layout_marginTop="12dp"
         app:layout_constraintTop_toBottomOf="@id/searchBox"
-        app:layout_constraintBottom_toTopOf="@id/btnAddCar"
+        app:layout_constraintBottom_toTopOf="@id/btnAddSelectedCars"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:listitem="@layout/item_search_car" />
+        tools:listitem="@layout/item_car" />
 
     <!-- Empty State -->
     <TextView
         android:id="@+id/emptyState"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/empty_no_cars_found"
+        android:text="@string/empty_no_cars_available"
         android:textColor="#BDBDBD"
         android:textSize="16sp"
         android:visibility="gone"
-        app:layout_constraintTop_toTopOf="@id/recyclerSearchCars"
-        app:layout_constraintBottom_toBottomOf="@id/recyclerSearchCars"
+        app:layout_constraintTop_toTopOf="@id/recyclerSelectCars"
+        app:layout_constraintBottom_toBottomOf="@id/recyclerSelectCars"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Botón Agregar -->
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnAddCar"
+        android:id="@+id/btnAddSelectedCars"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:layout_margin="16dp"
         android:backgroundTint="#C46625"
-        android:text="@string/button_add_selected_car"
+        android:text="@string/button_add_selected_cars"
         android:textColor="@android:color/white"
         android:enabled="false"
         app:iconGravity="textStart"

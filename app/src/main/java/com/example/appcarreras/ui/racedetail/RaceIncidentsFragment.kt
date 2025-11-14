@@ -76,26 +76,52 @@ class RaceIncidentsFragment : Fragment() {
     private fun cargarIncidencias() {
         if (torneoId == -1L || carreraId == -1) return
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            val incidenciasConCoche = incidenciaDao.obtenerIncidenciasConCoche(torneoId.toInt(), carreraId)
-            val mapped = incidenciasConCoche.map {
-                val time = String.format("%02d:%02d", it.incidencia.hora, it.incidencia.minuto)
-                val carName = "${it.marca} ${it.modelo}".trim()
-                RaceIncident(
-                    id = it.incidencia.idIncidencia,
-                    carNumber = it.dorsal,
-                    carName = carName,
-                    incidentType = it.incidencia.tipoIncidencia,
-                    time = time,
-                    penaltyLaps = it.incidencia.vueltasPenalizacion,
-                )
-            }
-            withContext(Dispatchers.Main) {
-                adapter.updateData(mapped)
-                val isEmpty = mapped.isEmpty()
-                binding.emptyIncidents.visibility = if (isEmpty) View.VISIBLE else View.GONE
-                binding.recyclerRaceIncidents.visibility = if (isEmpty) View.GONE else View.VISIBLE
+            try {
+                val incidenciasConCoche = incidenciaDao.obtenerIncidenciasConCoche(torneoId.toInt(), carreraId)
+                val mapped = incidenciasConCoche.map {
+                    val time = String.format("%02d:%02d", it.incidencia.hora, it.incidencia.minuto)
+                    val carName = "${it.marca} ${it.modelo}".trim()
+                    RaceIncident(
+                        id = it.incidencia.idIncidencia,
+                        carNumber = it.dorsal,
+                        carName = carName,
+                        incidentType = it.incidencia.tipoIncidencia,
+                        time = time,
+                        penaltyLaps = it.incidencia.vueltasPenalizacion,
+                    )
+                }
+                withContext(Dispatchers.Main) {
+                    adapter.updateData(mapped)
+                    val isEmpty = mapped.isEmpty()
+                    binding.emptyIncidents.visibility = if (isEmpty) View.VISIBLE else View.GONE
+                    binding.recyclerRaceIncidents.visibility = if (isEmpty) View.GONE else View.VISIBLE
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    mostrarError(getString(R.string.error_database))
+                }
             }
         }
+    }
+
+    private fun mostrarError(mensaje: String) {
+        com.google.android.material.snackbar.Snackbar.make(
+            binding.root,
+            mensaje,
+            com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+        ).setBackgroundTint(
+            androidx.core.content.ContextCompat.getColor(requireContext(), R.color.red)
+        ).show()
+    }
+
+    private fun mostrarExito(mensaje: String) {
+        com.google.android.material.snackbar.Snackbar.make(
+            binding.root,
+            mensaje,
+            com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
+        ).setBackgroundTint(
+            androidx.core.content.ContextCompat.getColor(requireContext(), R.color.trophy_green)
+        ).show()
     }
 
     private fun editarIncidencia(incident: RaceIncident) {
@@ -113,11 +139,20 @@ class RaceIncidentsFragment : Fragment() {
             .setTitle(R.string.dialog_delete_incident_title)
             .setMessage(R.string.dialog_delete_incident_message)
             .setPositiveButton(R.string.dialog_confirm) { _, _ ->
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val incidencia = incidenciaDao.obtenerIncidenciaPorId(incident.id)
-                    incidencia?.let {
-                        incidenciaDao.eliminarIncidencia(it)
-                        cargarIncidencias()
+                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                    try {
+                        val incidencia = incidenciaDao.obtenerIncidenciaPorId(incident.id)
+                        incidencia?.let {
+                            incidenciaDao.eliminarIncidencia(it)
+                            withContext(Dispatchers.Main) {
+                                cargarIncidencias()
+                                mostrarExito(getString(R.string.success_operation_completed))
+                            }
+                        }
+                    } catch (e: Exception) {
+                        withContext(Dispatchers.Main) {
+                            mostrarError(getString(R.string.error_database))
+                        }
                     }
                 }
             }

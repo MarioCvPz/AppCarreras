@@ -85,10 +85,10 @@ class AddIncidentActivity : AppCompatActivity() {
                     selectedIncidentType = it.tipoIncidencia
                     // Seleccionar el toggle button correspondiente
                     val toggleId = when (it.tipoIncidencia) {
-                        "Salida de pista" -> binding.toggleSalidaPista.id
-                        "Avería" -> binding.toggleAveria.id
-                        "Choque" -> binding.toggleChoque.id
-                        "Otros" -> binding.toggleOtros.id
+                        getString(R.string.incident_type_off_track) -> binding.toggleSalidaPista.id
+                        getString(R.string.incident_type_breakdown) -> binding.toggleAveria.id
+                        getString(R.string.incident_type_crash) -> binding.toggleChoque.id
+                        getString(R.string.incident_type_other) -> binding.toggleOtros.id
                         else -> null
                     }
                     toggleId?.let { id ->
@@ -109,34 +109,40 @@ class AddIncidentActivity : AppCompatActivity() {
 
     private fun setupDorsalSelector() {
         lifecycleScope.launch(Dispatchers.IO) {
-            // Solo obtener coches creados específicamente para esta carrera
-            val cochesCarrera = cocheDao.obtenerCochesPorCarrera(carreraId)
-            
-            // Ordenar por dorsal
-            val coches = cochesCarrera.sortedBy { it.dorsal }
-            
-            val dorsales = coches.map { it.dorsal }
-            
-            withContext(Dispatchers.Main) {
-                if (dorsales.isEmpty()) {
-                    binding.recyclerDorsales.visibility = View.GONE
-                    binding.tvNoCarsError.visibility = View.VISIBLE
-                    binding.btnSaveIncident.isEnabled = false
-                } else {
-                    binding.recyclerDorsales.visibility = View.VISIBLE
-                    binding.tvNoCarsError.visibility = View.GONE
-                    binding.btnSaveIncident.isEnabled = true
-                    
-                    dorsalAdapter = DorsalSelectorAdapter(dorsales) { dorsal ->
-                        selectedDorsal = dorsal
+            try {
+                // Solo obtener coches creados específicamente para esta carrera
+                val cochesCarrera = cocheDao.obtenerCochesPorCarrera(carreraId)
+                
+                // Ordenar por dorsal
+                val coches = cochesCarrera.sortedBy { it.dorsal }
+                
+                val dorsales = coches.map { it.dorsal }
+                
+                withContext(Dispatchers.Main) {
+                    if (dorsales.isEmpty()) {
+                        binding.recyclerDorsales.visibility = View.GONE
+                        binding.tvNoCarsError.visibility = View.VISIBLE
+                        binding.btnSaveIncident.isEnabled = false
+                    } else {
+                        binding.recyclerDorsales.visibility = View.VISIBLE
+                        binding.tvNoCarsError.visibility = View.GONE
+                        binding.btnSaveIncident.isEnabled = true
+                        
+                        dorsalAdapter = DorsalSelectorAdapter(dorsales) { dorsal ->
+                            selectedDorsal = dorsal
+                        }
+                        binding.recyclerDorsales.layoutManager = GridLayoutManager(this@AddIncidentActivity, 4)
+                        binding.recyclerDorsales.adapter = dorsalAdapter
+                        
+                        // Si estamos en modo edición, cargar los datos después de inicializar el adapter
+                        if (isEditMode) {
+                            cargarDatosIncidencia()
+                        }
                     }
-                    binding.recyclerDorsales.layoutManager = GridLayoutManager(this@AddIncidentActivity, 4)
-                    binding.recyclerDorsales.adapter = dorsalAdapter
-                    
-                    // Si estamos en modo edición, cargar los datos después de inicializar el adapter
-                    if (isEditMode) {
-                        cargarDatosIncidencia()
-                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    mostrarError(getString(R.string.error_database))
                 }
             }
         }
@@ -146,10 +152,10 @@ class AddIncidentActivity : AppCompatActivity() {
         binding.toggleGroupIncidentType.addOnButtonCheckedListener { group, checkedId, isChecked ->
             if (isChecked) {
                 val tipo = when (checkedId) {
-                    binding.toggleSalidaPista.id -> "Salida de pista"
-                    binding.toggleAveria.id -> "Avería"
-                    binding.toggleChoque.id -> "Choque"
-                    binding.toggleOtros.id -> "Otros"
+                    binding.toggleSalidaPista.id -> getString(R.string.incident_type_off_track)
+                    binding.toggleAveria.id -> getString(R.string.incident_type_breakdown)
+                    binding.toggleChoque.id -> getString(R.string.incident_type_crash)
+                    binding.toggleOtros.id -> getString(R.string.incident_type_other)
                     else -> return@addOnButtonCheckedListener
                 }
                 seleccionarTipoIncidencia(tipo)
@@ -162,10 +168,10 @@ class AddIncidentActivity : AppCompatActivity() {
         
         // Asignar valores automáticos según el tipo
         penaltyLaps = when (tipo) {
-            "Salida de pista" -> 3
-            "Avería" -> 5
-            "Choque" -> 2
-            "Otros" -> 0
+            getString(R.string.incident_type_off_track) -> 3
+            getString(R.string.incident_type_breakdown) -> 5
+            getString(R.string.incident_type_crash) -> 2
+            getString(R.string.incident_type_other) -> 0
             else -> 0
         }
         updatePenaltyLabel()
@@ -208,55 +214,81 @@ class AddIncidentActivity : AppCompatActivity() {
         if (!isValid) return
 
         lifecycleScope.launch(Dispatchers.IO) {
-            // Buscar el coche en esta carrera específica
-            val coche = cocheDao.obtenerCochePorDorsalEnCarrera(carreraId, selectedDorsal!!)
-            
-            if (coche == null) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(this@AddIncidentActivity, getString(R.string.error_car_not_found), Toast.LENGTH_SHORT).show()
+            try {
+                // Buscar el coche en esta carrera específica
+                val coche = cocheDao.obtenerCochePorDorsalEnCarrera(carreraId, selectedDorsal!!)
+                
+                if (coche == null) {
+                    withContext(Dispatchers.Main) {
+                        mostrarError(getString(R.string.error_car_not_found))
+                    }
+                    return@launch
                 }
-                return@launch
-            }
 
-            if (isEditMode && incidenciaId != null) {
-                // Modo edición: actualizar incidencia existente (mantener hora/minuto original)
-                val incidenciaExistente = incidenciaDao.obtenerIncidenciaPorId(incidenciaId!!)
-                incidenciaExistente?.let {
-                    val incidenciaActualizada = it.copy(
+                if (isEditMode && incidenciaId != null) {
+                    // Modo edición: actualizar incidencia existente (mantener hora/minuto original)
+                    val incidenciaExistente = incidenciaDao.obtenerIncidenciaPorId(incidenciaId!!)
+                    incidenciaExistente?.let {
+                        val incidenciaActualizada = it.copy(
+                            cocheId = coche.idCoche,
+                            tipoIncidencia = selectedIncidentType,
+                            // Mantener la hora y minuto originales al editar
+                            vueltasPenalizacion = penaltyLaps
+                        )
+                        incidenciaDao.actualizarIncidencia(incidenciaActualizada)
+                        withContext(Dispatchers.Main) {
+                            mostrarExito(getString(R.string.message_incident_updated))
+                            setResult(RESULT_OK)
+                            finish()
+                        }
+                    }
+                } else {
+                    // Modo creación: insertar nueva incidencia con hora/minuto actual
+                    val calendario = Calendar.getInstance()
+                    val incidencia = IncidenciaEntity(
+                        torneoId = torneoId.toInt(),
+                        carreraId = carreraId,
                         cocheId = coche.idCoche,
                         tipoIncidencia = selectedIncidentType,
-                        // Mantener la hora y minuto originales al editar
-                        vueltasPenalizacion = penaltyLaps
+                        hora = calendario.get(Calendar.HOUR_OF_DAY),
+                        minuto = calendario.get(Calendar.MINUTE),
+                        vueltasPenalizacion = penaltyLaps,
                     )
-                    incidenciaDao.actualizarIncidencia(incidenciaActualizada)
+
+                    incidenciaDao.insertarIncidencia(incidencia)
+
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(this@AddIncidentActivity, "Incidencia actualizada correctamente", Toast.LENGTH_SHORT).show()
+                        mostrarExito(getString(R.string.message_incident_saved))
                         setResult(RESULT_OK)
                         finish()
                     }
                 }
-            } else {
-                // Modo creación: insertar nueva incidencia con hora/minuto actual
-                val calendario = Calendar.getInstance()
-                val incidencia = IncidenciaEntity(
-                    torneoId = torneoId.toInt(),
-                    carreraId = carreraId,
-                    cocheId = coche.idCoche,
-                    tipoIncidencia = selectedIncidentType,
-                    hora = calendario.get(Calendar.HOUR_OF_DAY),
-                    minuto = calendario.get(Calendar.MINUTE),
-                    vueltasPenalizacion = penaltyLaps,
-                )
-
-                incidenciaDao.insertarIncidencia(incidencia)
-
+            } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@AddIncidentActivity, R.string.message_incident_saved, Toast.LENGTH_SHORT).show()
-                    setResult(RESULT_OK)
-                    finish()
+                    mostrarError(getString(R.string.error_database))
                 }
             }
         }
+    }
+
+    private fun mostrarExito(mensaje: String) {
+        com.google.android.material.snackbar.Snackbar.make(
+            binding.root,
+            mensaje,
+            com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
+        ).setBackgroundTint(
+            androidx.core.content.ContextCompat.getColor(this, R.color.trophy_green)
+        ).show()
+    }
+
+    private fun mostrarError(mensaje: String) {
+        com.google.android.material.snackbar.Snackbar.make(
+            binding.root,
+            mensaje,
+            com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+        ).setBackgroundTint(
+            androidx.core.content.ContextCompat.getColor(this, R.color.red)
+        ).show()
     }
 
     companion object {

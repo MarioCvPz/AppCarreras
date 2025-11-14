@@ -10,6 +10,7 @@
     <string name="tab_title_race_cars">Coches</string>
     <string name="tab_title_race_incidents">Incidencias</string>
     <string name="action_add_car_to_race">Agregar coche a carrera</string>
+    <string name="action_add_tournament_cars">Agregar coches del torneo</string>
     <string name="action_add_incident">Agregar incidencia</string>
     <string name="action_export_excel">Exportar a Excel</string>
     <string name="empty_race_cars">No hay coches registrados aún</string>
@@ -67,4 +68,82 @@
         <item>Avería</item>
         <item>Choque</item>
     </string-array>
+
+    <!-- AddCarActivity -->
+    <string name="title_register_new_car">Registro Nuevo Coche</string>
+    <string name="label_marca">Marca</string>
+    <string name="hint_marca">Marca coche</string>
+    <string name="label_modelo">Modelo</string>
+    <string name="hint_modelo">Modelo coche</string>
+    <string name="label_color">Color</string>
+    <string name="hint_color">Color coche</string>
+    <string name="label_dorsal">Dorsal</string>
+    <string name="hint_dorsal">Dorsal coche</string>
+    <string name="button_save_car">Guardar Coche</string>
+    <string name="button_saving">Guardando…</string>
+    <string name="button_search_existing_car">Buscar Coche Existente</string>
+    <string name="button_add_tournament_cars">Agregar Coches del Torneo</string>
+    <string name="error_torneo_not_found">Error: torneo no encontrado</string>
+    <string name="error_complete_all_fields">Por favor completa todos los campos</string>
+    <string name="error_invalid_number">Introduce un número válido</string>
+    <string name="error_dorsal_already_registered">El dorsal %1$d ya está registrado en este torneo. Por favor usa un número diferente.</string>
+    <string name="message_car_updated">Coche actualizado correctamente</string>
+    <string name="message_car_added">Coche agregado correctamente</string>
+
+    <!-- SearchCarActivity -->
+    <string name="title_search_existing_car">Buscar Coche Existente</string>
+    <string name="hint_search_car">Buscar coche que ya estuvo inscrito…</string>
+    <string name="button_add_selected_car">Agregar Coche Seleccionado</string>
+    <string name="error_select_car_first">Selecciona un coche primero</string>
+    <string name="error_invalid_torneo">Error: torneo no válido</string>
+    <string name="empty_no_cars_found">No se encontraron coches</string>
+
+    <!-- SelectTournamentCarsActivity -->
+    <string name="title_select_tournament_cars">Agregar Coches del Torneo</string>
+    <string name="button_add_selected_cars">Agregar Coches Seleccionados</string>
+    <string name="button_add_selected_cars_count">Agregar %1$d Coches</string>
+    <string name="error_select_cars_first">Selecciona al menos un coche</string>
+    <string name="empty_no_cars_available">No hay coches disponibles del torneo</string>
+    <string name="message_cars_added_to_race">%1$d coche(s) agregado(s) a la carrera</string>
+
+    <!-- MainActivity -->
+    <string name="button_add">Agregar</string>
+    <string name="button_save">Guardar</string>
+    <string name="hint_search_torneo">Buscar torneo…</string>
+    <string name="error_name_empty">El nombre no puede estar vacío</string>
+
+    <!-- RacesFragment -->
+    <string name="button_add_race">Agregar</string>
+
+    <!-- CarAdapter -->
+    <string name="label_color_prefix">Color: %1$s</string>
+
+    <!-- CampeonatoAdapter -->
+    <string name="label_cars_count">Coches: %1$d</string>
+
+    <!-- TorneoDetailActivity -->
+    <string name="tab_title_cars">Coches</string>
+    <string name="tab_title_races">Carreras</string>
+    <string name="default_tournament_name">Torneo</string>
+
+    <!-- AddIncidentActivity -->
+    <string name="incident_type_off_track">Salida de pista</string>
+    <string name="incident_type_breakdown">Avería</string>
+    <string name="incident_type_crash">Choque</string>
+    <string name="incident_type_other">Otros</string>
+    <string name="message_incident_updated">Incidencia actualizada correctamente</string>
+
+    <!-- Loading states -->
+    <string name="loading">Cargando…</string>
+    <string name="saving">Guardando…</string>
+    <string name="processing">Procesando…</string>
+
+    <!-- Success messages -->
+    <string name="success_operation_completed">Operación completada correctamente</string>
+
+    <!-- Error messages -->
+    <string name="error_operation_failed">No se pudo completar la operación</string>
+    <string name="error_network">Error de conexión. Verifica tu conexión a internet.</string>
+    <string name="error_database">Error al acceder a la base de datos</string>
+    <string name="error_unknown">Ha ocurrido un error inesperado</string>
 </resources>
